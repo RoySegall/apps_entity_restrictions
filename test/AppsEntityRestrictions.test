@@ -42,11 +42,18 @@ class AppsEntityRestrictions extends DrupalWebTestCase {
     try {
       $this->app->entityAccess('POST', 'user');
     } catch (\AppsEntityRestrictionsException $e) {
-      $this->pass('Apps entity restriction throw exception for not handled entity.');
+      $this->pass('Apps entity restriction throw exception for non handled entity.');
     }
 
+    // Check entity access.
     $this->assertTrue($this->app->entityAccess('get', 'node'), 'The app have access to node entity.');
     $this->assertFalse($this->app->entityAccess('post', 'node'), 'The app does not have access to node entity.');
+
+    // Check property access.
+    $this->assertTrue($this->app->entityPropertyAccess('get', 'node', 'nid'), 'The app have GET access to the node ID entity.');
+    $this->assertTrue($this->app->entityPropertyAccess('get', 'node', 'body'), 'The app have GET access to the node body entity.');
+    $this->assertFalse($this->app->entityPropertyAccess('get', 'node', 'field_date'), 'The app does not have GET access to the node date field.');
+    $this->assertFalse($this->app->entityPropertyAccess('post', 'node', 'field_date'), 'The app does not have POST access to the node date field.');
   }
 
 }

@@ -222,4 +222,24 @@ class DrupalConnectApps extends Entity {
 
     return in_array($op, $this->need[$entity_type]['methods']) ? TRUE : FALSE;
   }
+
+  /**
+   * Check entity property access.
+   *
+   * @param $op
+   *   The operation: create, read, update, delete.
+   * @param $entity_type
+   *   The entity type.
+   * @param $property
+   *   The property: nid, vid, field_date etc. etc.
+   *
+   * @return bool
+   */
+  public function entityPropertyAccess($op, $entity_type, $property) {
+    if (!$this->entityAccess($op, $entity_type)) {
+      return FALSE;
+    }
+
+    return in_array($property, $this->need[$entity_type]['property']) ? TRUE : FALSE;
+  }
 }
