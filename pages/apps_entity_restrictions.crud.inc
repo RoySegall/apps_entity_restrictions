@@ -181,7 +181,9 @@ function apps_entity_restrictions_app_form_validate($form, $form_state) {
       continue;
     }
 
-    $entity_selected = apps_entity_restrictions_is_selected($values[$entity]['exposed']);
+    if ($entity_selected = apps_entity_restrictions_is_selected($values[$entity]['exposed'])) {
+      break;
+    }
   }
 
   if (!$entity_selected) {

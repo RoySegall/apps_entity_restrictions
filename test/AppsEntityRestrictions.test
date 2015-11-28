@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * Contains AppsEntityRestrictions
+ */
+
+class AppsEntityRestrictions extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Apps entity restrictions basic',
+      'description' => 'Test apps entity restrictions basic logic.',
+      'group' => 'Apps entity restrictions',
+    );
+  }
+
+  /**
+   * @var DrupalConnectApps
+   */
+  protected $app;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp(array('apps_entity_restrictions'));
+
+    $this->app = apps_entity_restrictions_create();
+    $this->app->need = array(
+      'node' => array(
+        'methods' => array('get'),
+        'property' => array('nid', 'body'),
+      ),
+    );
+    $this->app->save();
+  }
+
+  /**
+   * Check basic access restrictions for entity.
+   */
+  public function testBasicRestrictions() {
+    try {
+      $this->app->entityAccess('POST', 'user');
+    } catch (\AppsEntityRestrictionsException $e) {
+      $this->pass('Apps entity restriction throw exception for not handled entity.');
+    }
+
+    $this->assertTrue($this->app->entityAccess('get', 'node'), 'The app have access to node entity.');
+    $this->assertFalse($this->app->entityAccess('post', 'node'), 'The app does not have access to node entity.');
+  }
+
+}
