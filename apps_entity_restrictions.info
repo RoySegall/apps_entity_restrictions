@@ -1,0 +1,8 @@
+name = Drupal connect apps
+description = Manage the apps that can use the information from you drupal site.
+core = 7.x
+
+dependencies[] = entity
+
+files[] = includes/apps_entity_restrictions.entity.inc
+

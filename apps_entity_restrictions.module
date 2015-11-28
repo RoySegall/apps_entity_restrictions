@@ -1,0 +1,426 @@
+<?php
+/**
+ * @file
+ * Main module file for the Drupal connect apps module.
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function apps_entity_restrictions_entity_info() {
+  return array(
+    'dc_app' => array(
+      'label' => t('Drupal connect apps'),
+      'entity class' => 'DrupalConnectApps',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'apps_entity_restrictions',
+      'entity keys' => array(
+        'id' => 'id',
+        'label' => 'title',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_apps_entity_restrictions_entity_ignore().
+ */
+function apps_entity_restrictions_apps_entity_restrictions_entity_ignore() {
+  return array(
+    'dc_app',
+  );
+}
+
+/**
+ * Create s Drupal connect app entity.
+ *
+ * @param $data
+ *  Initialize data of the Drupal connect app.
+ *
+ * @return DrupalConnectApps
+ *  Initialized object a Drupal connect app.
+ */
+function apps_entity_restrictions_create($data = array()) {
+  global $user;
+
+  $data += array(
+    'uid' => $user->uid,
+    'time' => REQUEST_TIME,
+    'status' => !variable_get('apps_need_approve'),
+  );
+
+  return entity_create('dc_app', $data);
+}
+
+/**
+ * Load multiple Drupal connect app entity.
+ *
+ * @param $ids
+ *   Array of Drupal connect apps IDs.
+ *
+ * @return DrupalConnectApps[]
+ *   Array of Drupal connect apps objects.
+ */
+function apps_entity_restrictions_load_multiple($ids) {
+  return entity_load('dc_app', $ids);
+}
+
+/**
+ * Load a single Drupal connect app entity.
+ *
+ * @param $id
+ *   Id a Drupal connect app entity.
+ *
+ * @return DrupalConnectApps
+ *   Drupal connect apps object.
+ */
+function apps_entity_restrictions_load($id) {
+ return entity_load_single('dc_app', $id);
+}
+
+/**
+ * Delete multiple Drupal connect app entity.
+ *
+ * @param $ids
+ *   List of Drupal connect app IDs to delete.
+ */
+function apps_entity_restrictions_delete_multiple($ids) {
+  entity_delete_multiple('dc_app', $ids);
+}
+
+/**
+ * Implements hook_menu().
+ */
+function apps_entity_restrictions_menu() {
+  $items = array();
+
+  $items['admin/apps'] = array(
+    'title' => 'Apps',
+    'description' => 'Create/edit/delete apps',
+    'page callback' => array('apps_entity_restrictions_main_app_page'),
+    'access callback' => 'apps_entity_restrictions_access_main_app_page',
+    'file' => 'apps_entity_restrictions.misc.inc',
+    'file path' => drupal_get_path('module', 'apps_entity_restrictions') . '/pages/',
+  );
+
+  $items['admin/apps/add'] = array(
+    'title' => 'Create app',
+    'description' => 'Add an app',
+    'type' => MENU_LOCAL_ACTION,
+    'access arguments' => array('create app'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('apps_entity_restrictions_app_form'),
+    'file' => 'apps_entity_restrictions.crud.inc',
+    'file path' => drupal_get_path('module', 'apps_entity_restrictions') . '/pages/',
+  );
+
+  $items['admin/apps/%apps_entity_restrictions/edit'] = array(
+    'title' => 'Edit',
+    'description' => 'Edit the app settings',
+    'access callback' => 'apps_entity_restrictions_access',
+    'access arguments' => array('edit', 2),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('apps_entity_restrictions_app_form', 2),
+    'file' => 'apps_entity_restrictions.crud.inc',
+    'file path' => drupal_get_path('module', 'apps_entity_restrictions') . '/pages/',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 0,
+  );
+
+  $items['admin/apps/%apps_entity_restrictions/delete'] = array(
+    'title' => 'Delete',
+    'description' => 'Delete an app.',
+    'access callback' => 'apps_entity_restrictions_access',
+    'access arguments' => array('delete', 2),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('apps_entity_restrictions_app_delete', 2),
+    'file' => 'apps_entity_restrictions.crud.inc',
+    'file path' => drupal_get_path('module', 'apps_entity_restrictions') . '/pages/',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+  );
+
+  if (module_exists('devel')) {
+    $items['admin/apps/%apps_entity_restrictions/devel'] = array(
+      'title' => 'Devel',
+      'page callback' => 'devel_load_object',
+      'page arguments' => array('apps_entity_restrictions', 2),
+      'access arguments' => array('access devel information'),
+      'type' => MENU_LOCAL_TASK,
+      'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+      'file' => 'devel.pages.inc',
+      'file path' => drupal_get_path('module', 'devel'),
+      'weight' => 20,
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function apps_entity_restrictions_admin_paths() {
+  return array(
+    'admin/apps' => TRUE,
+    'admin/apps/add' => TRUE,
+    'admin/apps/apps/*' => TRUE,
+    'admin/apps/apps/*/edit' => TRUE,
+    'admin/apps/apps/*/devel' => TRUE,
+    'admin/apps/apps/*/delete' => TRUE,
+  );
+}
+
+/**
+ * Access callback - determine if the user has access to the main app page.
+ */
+function apps_entity_restrictions_access_main_app_page($account = NULL) {
+  if (!$account) {
+    global $user;
+    $account = user_load($user->uid);
+  }
+
+  $permissions = array(
+    'manage apps', 'edit app', 'edit own app', 'delete app', 'delete own app',
+  );
+
+  foreach ($permissions as $permission) {
+    if (!user_access($permission, $account)) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+ * Access callback for action on app.
+ *
+ * @param $access
+ *   The access name.
+ * @param DrupalConnectApps $app
+ *   The app object
+ * @param $account
+ *   The user ID.
+ *
+ * @return bool
+ *   Return true or false if the user has access for this action.
+ */
+function apps_entity_restrictions_access($access, DrupalConnectApps $app, $account = NULL) {
+  if (!$account) {
+    global $user;
+    $account = user_load($user->uid);
+  }
+
+  // Check if the user can manage apps. The manage apps permission are bypass
+  // any permission.
+  if (user_access('manage apps')) {
+    return TRUE;
+  }
+
+  $edit_permission = $access;
+  if ($account->uid == $app->uid) {
+    $edit_permission .= ' own';
+  }
+  $edit_permission .= ' app';
+
+  // Collect access information from other modules. See first if other modules
+  // allowed this action. Only TRUE will accepted.
+  $invoked_access = module_invoke_all('apps_entity_restrictions_access', $access, $app, $account);
+  if (in_array(TRUE, $invoked_access, TRUE)) {
+    return TRUE;
+  }
+
+  return user_access($edit_permission, $account);
+}
+
+/**
+ * Access callback for approving an app. This will be able in two cases:
+ *  1. The app is disabled.
+ *  2. The user can approve apps.
+ *
+ * @param DrupalConnectApps $app
+ *   The app object.
+ * @param $account
+ *   The account of the user.
+ *
+ * @return bool
+ *   Return TRUE/FALSE if the app can be enabled.
+ */
+function apps_entity_restrictions_approve_app(DrupalConnectApps $app, $account = NULL) {
+  if (!$account) {
+    global $user;
+    $account = user_load($user->uid);
+  }
+
+  // The app is enabled. Get out!
+  if ($app->status) {
+    return FALSE;
+  }
+
+  return user_access('can approve app', $account) || user_access('manage apps', $account);
+}
+
+/**
+ * Implements hook_permission().
+ */
+function apps_entity_restrictions_permission() {
+  return array(
+    'create app' => array(
+      'title' => t('Create an app'),
+      'description' => t('Allow the user a permission to create an app.'),
+    ),
+    'edit own app' => array(
+      'title' => t('Edit own app'),
+      'description' => t('Allow to the user edit his own app.'),
+    ),
+    'edit app' => array(
+      'title' => t('Edit app'),
+      'description' => t('Allow user to edit apps which he not own them.'),
+    ),
+    'delete own app' => array(
+      'title' => t('Delete own app'),
+      'description' => t('Allow to the user delete his app.'),
+    ),
+    'delete app' => array(
+      'title' => t('Delete other app'),
+      'description' => t('Allow to the user delete apps which he not own them.'),
+    ),
+    'can approve app' => array(
+      'title' => t('Can approve app'),
+      'description' => t('When apps need to be approved, the user can approve apps.'),
+    ),
+    'manage apps' => array(
+      'title' => t('Manage app'),
+      'description' => t('Grant to the user manage apps. Give this to trusty users.'),
+    ),
+    'manage settings' => array(
+      'title' => t('Manage settings'),
+      'description' => t('Allow to user manage the settings of Drupal connect apps. Give this to trusty users.'),
+    ),
+  );
+}
+
+/**
+ * Load app entity by key and secret.
+ *
+ * @param $key
+ *   The key of the app.
+ * @param $secret
+ *   The secret key of the app.
+ *
+ * @return DrupalConnectApps
+ */
+function apps_entity_restrictions_load_by_keys($key, $secret) {
+  $info = &drupal_static(__FUNCTION__, array());
+  $static_identifier = $key . '_' . $secret;
+
+  if (!empty($info[$static_identifier])) {
+    $return = $info[$static_identifier];
+  }
+  else {
+    $query = new entityFieldQuery();
+
+    $result = $query
+      ->entityCondition('entity_type', 'dc_app')
+      ->propertyCondition('app_key', $key)
+      ->propertyCondition('app_secret', $secret)
+      ->execute();
+
+    $info[$static_identifier] = !empty($result['dc_app']) ? apps_entity_restrictions_load(reset($result['dc_app'])->id) : '';
+    $return = $info[$static_identifier];
+  }
+
+  return $return;
+}
+
+/**
+ * Build a list of properties and fields for an entity.
+ *
+ * @param $entity
+ *   The entity name.
+ *
+ * @return array
+ *   List of fields.
+ */
+function apps_entity_restrictions_build_fields($entity) {
+  $schema_info = array();
+
+  // Get the schema fields.
+  $info = entity_get_info($entity);
+
+  foreach ($info['schema_fields_sql']['base table'] as $property) {
+    $schema_info[$property] = ucfirst(str_replace('_', ' ', $property));
+  }
+
+  // Get the fields names.
+  $field_instances = field_info_instances($entity);
+
+  foreach ($field_instances as $bundle => $fields) {
+    foreach ($fields as $name => $field) {
+      $content_type_info = node_type_get_type($bundle);
+
+      $schema_info[$name] = $field['label'];
+      $schema_info[$name] .= $content_type_info ? " (" . $content_type_info->name . ")" : '';
+    }
+  }
+
+  return $schema_info;
+}
+
+/**
+ * Retrieve a list of entities which meant to be ignored in order for apps to
+ * not display there content.
+ */
+function apps_entity_restrictions_ignored_apps() {
+  if ($ignore = cache_get('apps_entity_restrictions_ignore')) {
+    // Information already cached - use him.
+    return $ignore->data;
+  }
+
+  // Get all the entities which users are not allowed to access their entries.
+  $ignore = module_invoke_all('apps_entity_restrictions_entity_ignore');
+
+  // Let other module to alter the list of entities.
+  drupal_alter('apps_entity_restrictions_entity_ignore', $ignore);
+
+  // Cache the ignored apps.
+  cache_set('apps_entity_restrictions_ignore', $ignore);
+
+  return $ignore;
+}
+
+/**
+ * Check if an entity need to be shown as selected.
+ *
+ * @param $info_need
+ *   The method and selected properies.
+ *
+ * @return bool
+ */
+function apps_entity_restrictions_is_selected($info_need) {
+  $methods = $info_need['methods'];
+  $properties = $info_need['properties'];
+
+  $entity_selected = false;
+
+  if (!empty($methods)) {
+    foreach ($methods as $method) {
+      if ($method) {
+        $entity_selected = TRUE;
+        break;
+      }
+    }
+  }
+
+  if (!empty($property)) {
+    foreach ($properties as $property) {
+      if ($property) {
+        $entity_selected = TRUE;
+        break;
+      }
+    }
+  }
+
+  return $entity_selected;
+}
