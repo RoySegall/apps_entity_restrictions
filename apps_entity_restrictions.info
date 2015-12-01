@@ -1,12 +1,11 @@
-name = Drupal connect apps
-description = Manage the apps that can use the information from you drupal site.
+name = Apps entity restrictions
+description = Manage entity restrictions access for entities resources.
 core = 7.x
 
 dependencies[] = entity
 
 ; Required.
 files[] = includes/apps_entity_restrictions.entity.inc
-files[] = includes/DrupalConnectAppsQuery.php
 
 ; Exception
 files[] = includes/AppsEntityRestrictionsException.php

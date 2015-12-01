@@ -15,7 +15,7 @@ class AppsEntityRestrictions extends DrupalWebTestCase {
   }
 
   /**
-   * @var DrupalConnectApps
+   * @var AppsEntityRestriction
    */
   protected $app;
 

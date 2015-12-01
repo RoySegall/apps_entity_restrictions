@@ -10,12 +10,12 @@
 function apps_entity_restrictions_main_app_page() {
   $query = new entityFieldQuery();
   $result = $query
-    ->entityCondition('entity_type', 'dc_app')
+    ->entityCondition('entity_type', 'apps_entity_restrictions')
     ->execute();
 
   $apps = array();
-  if (!empty($result['dc_app'])) {
-    $apps = apps_entity_restrictions_load_multiple(array_keys($result['dc_app']));
+  if (!empty($result['apps_entity_restrictions'])) {
+    $apps = apps_entity_restrictions_load_multiple(array_keys($result['apps_entity_restrictions']));
   }
 
   $header = array(
@@ -31,7 +31,6 @@ function apps_entity_restrictions_main_app_page() {
       $params = array(
         '@key' => $app->app_key,
         '@secret' => $app->app_secret,
-        '@site' => $app->app_site,
       );
 
       $items = array();

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Installing file for Drupal connect apps.
+ * Installing file for Apps entity restrictions.
  */
 
 /**
@@ -11,10 +11,10 @@ function apps_entity_restrictions_schema() {
   $schema = array();
 
   $schema['apps_entity_restrictions'] = array(
-    'description' => 'Holds the information for the Drupal connect applications.',
+    'description' => 'Holds the information for the Apps entity restrictions.',
     'fields' => array(
       'id' => array(
-        'description' => 'The primary identifier for a applications.',
+        'description' => 'The identifier.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -62,16 +62,6 @@ function apps_entity_restrictions_schema() {
       ),
       'app_secret' => array(
         'description' => 'The secret of the app.',
-        'type' => 'text',
-      ),
-      'connect_with' => array(
-        'description' => 'Define if this a connect with application',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'app_site' => array(
-        'description' => 'The site address which the data will be pulled from.',
         'type' => 'text',
       ),
       'metadata' => array(

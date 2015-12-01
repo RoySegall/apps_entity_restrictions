@@ -2,15 +2,16 @@
 
 /**
  * @file
- * Describing the hooks available via Drupal apps connect module.
+ * Describing the hooks available via Apps entity restrictions module.
  */
 
 /**
  * Implements hook_apps_entity_restrictions_generate_links_action_alter().
  *
- * Each Drupal connect apps entity has a method for generate links. The method
- * is helpful when we want to create a link relate to action we need apply on
- * the entity: editing, deleting or watching the documentation of the app.
+ * Each app entity restriction entity has a method for generate links. The
+ * method is helpful when we want to create a link relate to action we need
+ * apply on the entity: editing, deleting or watching the documentation of the
+ * app.
  *
  * When other module want to add a new action and want to use the method for
  * generating the link for the action they should use these hook.
@@ -21,10 +22,10 @@
  *
  * @param $actions
  *   List of actions that which the method can use.
- * @param DrupalConnectApps $app
+ * @param AppsEntityRestriction $app
  *   The app object.
  */
-function hook_apps_entity_restrictions_generate_links_action_alter(&$actions, DrupalConnectApps $app) {
+function hook_apps_entity_restrictions_generate_links_action_alter(&$actions, AppsEntityRestriction $app) {
   $actions['new_action'] = array(
     'title' => t('New action'),
     'href' => 'apps/' . $app->id . '/new_action',
@@ -34,15 +35,15 @@ function hook_apps_entity_restrictions_generate_links_action_alter(&$actions, Dr
 /**
  * Implements hook_apps_entity_restrictions_app_options_alter().
  *
- * On the admin page each app has options that the user can apply on app. This
- * hook allow you to add more option for each application.
+ * On the admin page, each app has an options which the user can apply on app.
+ * This hook allow you to add more option for each application.
  *
  * @param $items
  *   The links to display for the user.
- * @param DrupalConnectApps $app
+ * @param AppsEntityRestriction $app
  *   The app object.
  */
-function hook_apps_entity_restrictions_app_options_alter(&$items, DrupalConnectApps $app) {
+function hook_apps_entity_restrictions_app_options_alter(&$items, AppsEntityRestriction $app) {
   $items[] = $app->generateLink('new_action');
 }
 
@@ -51,14 +52,15 @@ function hook_apps_entity_restrictions_app_options_alter(&$items, DrupalConnectA
  *
  * Allow other module to grant action for a specific action. This will consider
  * if other modules has different logic for access permission which are not edit
- * or delete or just want to bypass the apps_entity_restrictions_access function.
+ * or delete or just want to bypass the apps_entity_restrictions_access
+ * function.
  *
  * The hook_apps_entity_restrictions_access() need to return TRUE or FALSE.
  * @see hook_node_access().
  *
  * @param $access
  *   The access name.
- * @param DrupalConnectApps $app
+ * @param AppsEntityRestriction $app
  *   The app object
  * @param $account
  *   The loaded user account.
@@ -66,13 +68,13 @@ function hook_apps_entity_restrictions_app_options_alter(&$items, DrupalConnectA
  * @return bool
  *   Need to return TRUE/FALSE.
  */
-function hook_apps_entity_restrictions_access($access, DrupalConnectApps $app, $account) {
+function hook_apps_entity_restrictions_access($access, AppsEntityRestriction $app, $account) {
 }
 
 /**
  * Implements hook_apps_entity_restrictions_entity_ignore().
  *
- * Allow to module decide which apps can be selected when creating a new app.
+ * Allow modules to hide their entities from being display when creating an app.
  *
  * @return array
  *   Array of entities machine name to be ignored when creating a new app.

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Main module file for the Drupal connect apps module.
+ * Main module file for the Apps entity restrictions module.
  */
 
 /**
@@ -9,9 +9,9 @@
  */
 function apps_entity_restrictions_entity_info() {
   return array(
-    'dc_app' => array(
-      'label' => t('Drupal connect apps'),
-      'entity class' => 'DrupalConnectApps',
+    'apps_entity_restrictions' => array(
+      'label' => t('Apps entity restrictions'),
+      'entity class' => 'AppsEntityRestriction',
       'controller class' => 'EntityAPIController',
       'base table' => 'apps_entity_restrictions',
       'entity keys' => array(
@@ -27,18 +27,18 @@ function apps_entity_restrictions_entity_info() {
  */
 function apps_entity_restrictions_apps_entity_restrictions_entity_ignore() {
   return array(
-    'dc_app',
+    'apps_entity_restrictions',
   );
 }
 
 /**
- * Create s Drupal connect app entity.
+ * Create apps entity restriction entity.
  *
  * @param $data
- *  Initialize data of the Drupal connect app.
+ *  Initialize data of the Apps entity restrictions.
  *
- * @return DrupalConnectApps
- *  Initialized object a Drupal connect app.
+ * @return AppsEntityRestriction
+ *  Initialized object a Apps entity restrictions.
  */
 function apps_entity_restrictions_create($data = array()) {
   global $user;
@@ -49,43 +49,43 @@ function apps_entity_restrictions_create($data = array()) {
     'status' => !variable_get('apps_need_approve'),
   );
 
-  return entity_create('dc_app', $data);
+  return entity_create('apps_entity_restrictions', $data);
 }
 
 /**
- * Load multiple Drupal connect app entity.
+ * Load multiple Apps entity restrictions entity.
  *
  * @param $ids
- *   Array of Drupal connect apps IDs.
+ *   Array of Apps entity restrictions IDs.
  *
- * @return DrupalConnectApps[]
- *   Array of Drupal connect apps objects.
+ * @return AppsEntityRestriction[]
+ *   Array of Apps entity restrictions objects.
  */
 function apps_entity_restrictions_load_multiple($ids) {
-  return entity_load('dc_app', $ids);
+  return entity_load('apps_entity_restrictions', $ids);
 }
 
 /**
- * Load a single Drupal connect app entity.
+ * Load a single Apps entity restrictions entity.
  *
  * @param $id
- *   Id a Drupal connect app entity.
+ *   Id a Apps entity restrictions entity.
  *
- * @return DrupalConnectApps
- *   Drupal connect apps object.
+ * @return AppsEntityRestriction
+ *   Apps entity restrictions object.
  */
 function apps_entity_restrictions_load($id) {
- return entity_load_single('dc_app', $id);
+ return entity_load_single('apps_entity_restrictions', $id);
 }
 
 /**
- * Delete multiple Drupal connect app entity.
+ * Delete multiple Apps entity restrictions entity.
  *
  * @param $ids
- *   List of Drupal connect app IDs to delete.
+ *   List of Apps entity restrictions IDs to delete.
  */
 function apps_entity_restrictions_delete_multiple($ids) {
-  entity_delete_multiple('dc_app', $ids);
+  entity_delete_multiple('apps_entity_restrictions', $ids);
 }
 
 /**
@@ -173,6 +173,11 @@ function apps_entity_restrictions_admin_paths() {
 
 /**
  * Access callback - determine if the user has access to the main app page.
+ *
+ * @param $account
+ *   The user object.
+ *
+ * @return bool
  */
 function apps_entity_restrictions_access_main_app_page($account = NULL) {
   if (!$account) {
@@ -198,7 +203,7 @@ function apps_entity_restrictions_access_main_app_page($account = NULL) {
  *
  * @param $access
  *   The access name.
- * @param DrupalConnectApps $app
+ * @param AppsEntityRestriction $app
  *   The app object
  * @param $account
  *   The user ID.
@@ -206,7 +211,7 @@ function apps_entity_restrictions_access_main_app_page($account = NULL) {
  * @return bool
  *   Return true or false if the user has access for this action.
  */
-function apps_entity_restrictions_access($access, DrupalConnectApps $app, $account = NULL) {
+function apps_entity_restrictions_access($access, AppsEntityRestriction $app, $account = NULL) {
   if (!$account) {
     global $user;
     $account = user_load($user->uid);
@@ -232,33 +237,6 @@ function apps_entity_restrictions_access($access, DrupalConnectApps $app, $accou
   }
 
   return user_access($edit_permission, $account);
-}
-
-/**
- * Access callback for approving an app. This will be able in two cases:
- *  1. The app is disabled.
- *  2. The user can approve apps.
- *
- * @param DrupalConnectApps $app
- *   The app object.
- * @param $account
- *   The account of the user.
- *
- * @return bool
- *   Return TRUE/FALSE if the app can be enabled.
- */
-function apps_entity_restrictions_approve_app(DrupalConnectApps $app, $account = NULL) {
-  if (!$account) {
-    global $user;
-    $account = user_load($user->uid);
-  }
-
-  // The app is enabled. Get out!
-  if ($app->status) {
-    return FALSE;
-  }
-
-  return user_access('can approve app', $account) || user_access('manage apps', $account);
 }
 
 /**
@@ -296,7 +274,7 @@ function apps_entity_restrictions_permission() {
     ),
     'manage settings' => array(
       'title' => t('Manage settings'),
-      'description' => t('Allow to user manage the settings of Drupal connect apps. Give this to trusty users.'),
+      'description' => t('Allow to user manage the settings of Apps entity restrictions. Give this to trusty users.'),
     ),
   );
 }
@@ -309,7 +287,7 @@ function apps_entity_restrictions_permission() {
  * @param $secret
  *   The secret key of the app.
  *
- * @return DrupalConnectApps
+ * @return AppsEntityRestriction
  */
 function apps_entity_restrictions_load_by_keys($key, $secret) {
   $info = &drupal_static(__FUNCTION__, array());
@@ -322,12 +300,12 @@ function apps_entity_restrictions_load_by_keys($key, $secret) {
     $query = new entityFieldQuery();
 
     $result = $query
-      ->entityCondition('entity_type', 'dc_app')
+      ->entityCondition('entity_type', 'apps_entity_restrictions')
       ->propertyCondition('app_key', $key)
       ->propertyCondition('app_secret', $secret)
       ->execute();
 
-    $info[$static_identifier] = !empty($result['dc_app']) ? apps_entity_restrictions_load(reset($result['dc_app'])->id) : '';
+    $info[$static_identifier] = !empty($result['apps_entity_restrictions']) ? apps_entity_restrictions_load(reset($result['apps_entity_restrictions'])->id) : '';
     $return = $info[$static_identifier];
   }
 
@@ -341,7 +319,7 @@ function apps_entity_restrictions_load_by_keys($key, $secret) {
  *   The entity name.
  *
  * @return array
- *   List of fields.
+ *   List of fields and properties.
  */
 function apps_entity_restrictions_build_fields($entity) {
   $schema_info = array();
@@ -370,7 +348,7 @@ function apps_entity_restrictions_build_fields($entity) {
 
 /**
  * Retrieve a list of entities which meant to be ignored in order for apps to
- * not display there content.
+ * not display their content.
  */
 function apps_entity_restrictions_ignored_apps() {
   if ($ignore = cache_get('apps_entity_restrictions_ignore')) {
@@ -394,7 +372,7 @@ function apps_entity_restrictions_ignored_apps() {
  * Check if an entity need to be shown as selected.
  *
  * @param $info_need
- *   The method and selected properies.
+ *   The method and selected properties.
  *
  * @return bool
  */

@@ -1,6 +1,12 @@
 <?php
 
-class DrupalConnectApps extends Entity {
+/**
+ * @file
+ *
+ * Contains \AppsEntityRestriction
+ */
+
+class AppsEntityRestriction extends Entity {
 
   /**
    * @var
@@ -68,38 +74,9 @@ class DrupalConnectApps extends Entity {
   /**
    * @var
    *
-   * The site address which the data will be pulled from.
-   */
-  public $app_site;
-
-  /**
-   * @var
-   *
    * Holds metadata information about the app.
    */
   public $metadata;
-
-  /**
-   * @var DrupalConnectAppsQuery
-   */
-  protected $query;
-
-  /**
-   * Setting the query object when accessing.
-   */
-  function query() {
-    $this->query = new DrupalConnectAppsQuery($this);
-
-    return $this->query;
-  }
-
-  /**
-   * Overrides save().
-   */
-  public function save() {
-    // Before saving verify the user did not changed the key and secret keys.
-    parent::save();
-  }
 
   /**
    * Generating links of the app.
@@ -109,7 +86,7 @@ class DrupalConnectApps extends Entity {
    * @param $account
    *   The account user. This will take care of permissions.
    *
-   * @return String
+   * @return string
    *   The link for the action.
    */
   public function generateLink($action, $account = NULL) {
@@ -166,7 +143,7 @@ class DrupalConnectApps extends Entity {
    * @param $value
    *   The value of the metadata.
    *
-   * @return DrupalConnectApps
+   * @return AppsEntityRestriction
    */
   public function setMetaData($name, $value) {
     $this->metadata[$name] = $value;
@@ -187,19 +164,6 @@ class DrupalConnectApps extends Entity {
    */
   public function supportMethod($data, $method) {
     return !empty($this->need[$data]['methods'][$method]);
-  }
-
-  /**
-   * Check if the app support a specific asset.
-   *
-   * @param $asset
-   *   The asset type: node, user, comment etc. etc.
-   *
-   * @return Bool
-   *   Return true/false weather the app support the requested asset.
-   */
-  public function supportAsset($asset) {
-    // todo: Complete the method.
   }
 
   /**
@@ -242,4 +206,5 @@ class DrupalConnectApps extends Entity {
 
     return in_array($property, $this->need[$entity_type]['property']) ? TRUE : FALSE;
   }
+
 }
