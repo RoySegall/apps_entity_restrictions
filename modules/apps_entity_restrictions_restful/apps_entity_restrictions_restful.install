@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Install file for Apps entity restrictions restful.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function apps_entity_restrictions_restful_install() {
+  // Defining the basic headers in which application should pass their
+  // credentials.
+  variable_set('apps_entity_restrictions_restful_public_public_key', 'public');
+  variable_set('apps_entity_restrictions_restful_public_secret_key', 'secret');
+}

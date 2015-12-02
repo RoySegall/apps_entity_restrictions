@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * apps_entity_restrictions_restful.module
+ */
+
+/**
+ * Implements hook_restful_parse_request_alter()
+ */
+function apps_entity_restrictions_restful_restful_parse_request_alter(&$request) {
+  $keys = array(
+    variable_get('apps_entity_restrictions_restful_public_public_key'),
+    variable_get('apps_entity_restrictions_restful_public_secret_key'),
+  );
+
+  foreach ($keys as $key) {
+    $value = \RestfulManager::getRequestHttpHeader($key);
+
+    if (!$value && !empty($_GET[$key])) {
+      // If no access token found on the HTTP header, check if it's in the URL
+      // itself. This allows to do a POST request to for example:
+      // https://example.com/api/file-upload?access_token=foo
+      $value = $_GET[$key];
+    }
+
+    $request['__application'] += array(
+      $key => $value,
+    );
+  }
+}
