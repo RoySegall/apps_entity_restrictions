@@ -41,10 +41,10 @@ before_script:
   - mysql -e 'create database drupal'
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes core-quick-drupal --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --enable=simpletest drupal
 
-  # reference and enable travis_ci_drupal_module_example in build site
-  - ln -s $(readlink -e $(cd -)) drupal/drupal/sites/all/modules/travis_ci_drupal_module_example
+  # reference and enable apps_entity_restrictions in build site
+  - ln -s $(readlink -e $(cd -)) drupal/drupal/sites/all/modules/apps_entity_restrictions
   - cd drupal/drupal
-  - drush --yes pm-enable travis_ci_drupal_module_example
+  - drush --yes pm-enable apps_entity_restrictions
 
   # start a web server on port 8080, run in the background; wait for initialization
   - drush runserver 127.0.0.1:8080 &
