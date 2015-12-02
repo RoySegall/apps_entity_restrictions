@@ -6,6 +6,34 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function apps_entity_restrictions_restful_menu() {
+  $items = array();
+
+  $items['admin/config/services/apps_entity_restrictions_restful'] = array(
+    'title' => 'Apps entity restrictions Restful',
+    'description' => 'Manage settings relate to Apps entity restrictions restful',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('apps_entity_restrictions_settings'),
+    'access arguments' => array('manage apps entity restrictions restful settings'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function apps_entity_restrictions_restful_permission() {
+  return array(
+    'manage apps entity restrictions restful settings' => array(
+      'title' => t('Manage Apps entity restrictions Restful settings'),
+    ),
+  );
+}
+
+/**
  * Implements hook_restful_parse_request_alter()
  */
 function apps_entity_restrictions_restful_restful_parse_request_alter(&$request) {
@@ -28,4 +56,13 @@ function apps_entity_restrictions_restful_restful_parse_request_alter(&$request)
       $key => $value,
     );
   }
+}
+
+/**
+ * Menu callback; Form settings.
+ */
+function apps_entity_restrictions_settings($form, &$form_state) {
+  $form = array();
+
+  return system_settings_form($form);
 }
