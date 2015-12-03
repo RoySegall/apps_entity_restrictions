@@ -62,7 +62,20 @@ function apps_entity_restrictions_restful_restful_parse_request_alter(&$request)
  * Menu callback; Form settings.
  */
 function apps_entity_restrictions_settings($form, &$form_state) {
-  $form = array();
+
+  $form['apps_entity_restrictions_restful_public_public_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Public key property'),
+    '#description' => t('Define which parameter in the header will hold the app public key.'),
+    '#default_value' => variable_get('apps_entity_restrictions_restful_public_public_key'),
+  );
+
+  $form['apps_entity_restrictions_restful_public_secret_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Secret key property'),
+    '#description' => t('Define which parameter in the header will hold the app secret key.'),
+    '#default_value' => variable_get('apps_entity_restrictions_restful_public_secret_key'),
+  );
 
   return system_settings_form($form);
 }
