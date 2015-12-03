@@ -5,7 +5,7 @@ core = 7.x
 dependencies[] = entity
 
 ; Required.
-files[] = includes/apps_entity_restrictions.entity.inc
+files[] = includes/AppsEntityRestriction.php
 
 ; Exception
 files[] = includes/AppsEntityRestrictionsException.php

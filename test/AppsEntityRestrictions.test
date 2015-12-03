@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Contains AppsEntityRestrictions
+ * Contains AppsEntityRestrictionsBase
  */
 
-class AppsEntityRestrictions extends DrupalWebTestCase {
+class AppsEntityRestrictionsBase extends DrupalWebTestCase {
 
   public static function getInfo() {
     return array(
