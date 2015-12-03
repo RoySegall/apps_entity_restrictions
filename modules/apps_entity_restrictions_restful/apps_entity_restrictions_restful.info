@@ -1,8 +1,14 @@
 name = Apps entity restrictions Restful
 description = Integration between restful and Apps entity restrictions
+package = Apps entity restrictions
 core = 7.x
 
 dependencies[] = apps_entity_restrictions
 dependencies[] = restful
 
 files[] = includes/AppsEntityRestrictionsRestful.php
+files[] = includes/RestfulEntityBase.php
+files[] = includes/RestfulEntityBaseMultipleBundles.php
+files[] = includes/RestfulEntityBaseNode.php
+files[] = includes/RestfulEntityBaseTaxonomyTerm.php
+files[] = includes/RestfulEntityBaseUser.php

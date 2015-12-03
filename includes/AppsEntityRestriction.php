@@ -151,6 +151,15 @@ class AppsEntityRestriction extends Entity {
     return $this;
   }
 
+  public function save() {
+    if (empty($this->app_key) || empty($this->app_secret)) {
+      $this->generateKeyAndSecret();
+    }
+
+    return parent::save();
+  }
+
+
   /**
    * Check if the app support a specific method.
    *

@@ -1,16 +1,12 @@
 name = Apps entity restrictions
 description = Manage entity restrictions access for entities resources.
+package = Apps entity restrictions
 core = 7.x
 
 dependencies[] = entity
 
 ; Required.
 files[] = includes/AppsEntityRestriction.php
-files[] = includes/RestfulEntityBase.php
-files[] = includes/RestfulEntityBaseMultipleBundles.php
-files[] = includes/RestfulEntityBaseNode.php
-files[] = includes/RestfulEntityBaseTaxonomyTerm.php
-files[] = includes/RestfulEntityBaseUser.php
 
 ; Exception
 files[] = includes/AppsEntityRestrictionsException.php
