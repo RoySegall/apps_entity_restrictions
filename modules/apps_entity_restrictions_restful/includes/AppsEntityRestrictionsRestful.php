@@ -82,9 +82,15 @@ class AppsEntityRestrictionsRestful {
    *
    * @param RestfulBase $plugin
    *   The plugin instance.
+   * @param $fields
+   *   The public fields definition.
+   *
+   * @return array
+   *   The list of public fields with the access callback array.
    */
-  static public function propertyAccessCallbacks(RestfulBase $plugin) {
+  static public function publicFieldsInfo(RestfulBase $plugin, $fields) {
 
+    return $fields;
   }
 
 }

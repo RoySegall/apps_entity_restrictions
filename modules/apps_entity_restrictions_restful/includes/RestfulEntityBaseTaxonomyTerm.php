@@ -6,7 +6,7 @@
  */
 
 /**
- * @see AppsEntityRestrictionsRestful::propertyAccessCallbacks().
+ * @see AppsEntityRestrictionsRestful::publicFieldsInfo().
  */
 class AppsEntityRestrictionsRestfulBaseTaxonomyTerm extends RestfulEntityBaseTaxonomyTerm {
 
@@ -16,9 +16,7 @@ class AppsEntityRestrictionsRestfulBaseTaxonomyTerm extends RestfulEntityBaseTax
   public function publicFieldsInfo() {
     $fields = parent::publicFieldsInfo();
 
-    AppsEntityRestrictionsRestful::propertyAccessCallbacks($this);
-
-    return $fields;
+    return AppsEntityRestrictionsRestful::publicFieldsInfo($this, $fields);
   }
 
 }

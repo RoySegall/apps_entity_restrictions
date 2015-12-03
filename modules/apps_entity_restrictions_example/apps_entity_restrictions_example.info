@@ -4,3 +4,5 @@ package = Apps entity restrictions
 core = 7.x
 
 dependencies[] = apps_entity_restrictions_restful
+
+files[] = includes/AppsEntityRestrictionsExampleArticle.php

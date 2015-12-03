@@ -6,7 +6,7 @@
  */
 
 /**
- * @see AppsEntityRestrictionsRestful::propertyAccessCallbacks().
+ * @see AppsEntityRestrictionsRestful::publicFieldsInfo().
  */
 abstract class AppsEntityRestrictionsRestfulBase extends RestfulEntityBase {
 
@@ -16,9 +16,7 @@ abstract class AppsEntityRestrictionsRestfulBase extends RestfulEntityBase {
   public function publicFieldsInfo() {
     $fields = parent::publicFieldsInfo();
 
-    AppsEntityRestrictionsRestful::propertyAccessCallbacks($this);
-
-    return $fields;
+    return AppsEntityRestrictionsRestful::publicFieldsInfo($this, $fields);
   }
 
 }
