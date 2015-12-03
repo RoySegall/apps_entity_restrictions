@@ -57,7 +57,7 @@ class AppsEntityRestrictionsRestful {
    *
    * @throws RestfulBadRequestException
    */
-  public static function loadByHeaders() {
+  static public function loadByHeaders() {
     if (!self::applicationCredentialExists()) {
       throw new RestfulBadRequestException("You need to provide the application's credentials.");
     }
@@ -67,4 +67,24 @@ class AppsEntityRestrictionsRestful {
 
     return apps_entity_restrictions_load_by_keys($request['__application'][$keys['public']], $request['__application'][$keys['secret']]);
   }
+
+  /**
+   * Alter the public fields definition by adding access callback.
+   *
+   * Restful have a base class for each entity. Apps entity restriction will
+   * extend each controller and will override the public fields info. The
+   * overridden is needed in order to add to each public field an access
+   * callback.
+   *
+   * In that access callback, the app restrictions for that entity will be
+   * checked and a boolean value will determine if the app have any access to
+   * that property.
+   *
+   * @param RestfulBase $plugin
+   *   The plugin instance.
+   */
+  static public function propertyAccessCallbacks(RestfulBase $plugin) {
+
+  }
+
 }
