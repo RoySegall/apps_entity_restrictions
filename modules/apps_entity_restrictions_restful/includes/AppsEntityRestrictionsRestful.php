@@ -87,10 +87,30 @@ class AppsEntityRestrictionsRestful {
    *
    * @return array
    *   The list of public fields with the access callback array.
+   *
+   * @throws RestfulBadRequestException
    */
   static public function publicFieldsInfo(RestfulBase $plugin, $fields) {
 
+    foreach ($fields as $property => &$info) {
+      if ($property == 'self') {
+        // No need to check the safe public field. It's just a URL.
+        continue;
+      }
+
+      $info['access_callbacks'][] = array('AppsEntityRestrictionsRestful', 'accessCallbacks');
+    }
+
     return $fields;
+  }
+
+  /**
+   * Public function access callbacks.
+   *
+   * @return bool
+   */
+  static public function accessCallbacks($op, $public_field_name, EntityMetadataWrapper $property_wrapper, EntityMetadataWrapper $wrapper) {
+    return RestfulInterface::ACCESS_DENY;
   }
 
 }
