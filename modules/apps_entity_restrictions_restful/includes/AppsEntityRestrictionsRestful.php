@@ -110,7 +110,22 @@ class AppsEntityRestrictionsRestful {
    * @return bool
    */
   static public function accessCallbacks($op, $public_field_name, EntityMetadataWrapper $property_wrapper, EntityMetadataWrapper $wrapper) {
-    return RestfulInterface::ACCESS_DENY;
+    if (!$app = self::loadByHeaders()) {
+      // No application info available. Return early.
+      return RestfulInterface::ACCESS_IGNORE;
+    }
+
+    $op_replacement = array(
+      'view' => 'get',
+    );
+
+    $info = $property_wrapper->info();
+
+    if (empty($info['name'])) {
+      return RestfulInterface::ACCESS_IGNORE;
+    }
+
+    return $app->entityPropertyAccess($op_replacement[$op], $wrapper->type(), $info['name']) ? RestfulInterface::ACCESS_ALLOW : RestfulInterface::ACCESS_DENY;
   }
 
 }

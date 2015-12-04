@@ -10,6 +10,10 @@ class AppsEntityRestrictionsExampleArticle extends AppsEntityRestrictionsRestful
   public function publicFieldsInfo() {
     $fields = parent::publicFieldsInfo();
 
+    $fields['body'] = array(
+      'property' => 'body',
+    );
+
     return AppsEntityRestrictionsRestful::publicFieldsInfo($this, $fields);
   }
 

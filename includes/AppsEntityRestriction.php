@@ -190,7 +190,7 @@ class AppsEntityRestriction extends Entity {
     $entity_info = entity_get_info($entity_type);
 
     if (empty($this->need[$entity_type])) {
-      throw new AppsEntityRestrictionsException(format_string('The app does not handle @name', array('@name' => $entity_info['label'])));
+      throw new AppsEntityRestrictionsException(format_string('The app does not handle @name', array('@name' => $op)));
     }
 
     return in_array($op, $this->need[$entity_type]['methods']) && $this->need[$entity_type]['methods'][$op] ? TRUE : FALSE;
