@@ -213,7 +213,7 @@ class AppsEntityRestriction extends Entity {
       return FALSE;
     }
 
-    return in_array($property, $this->need[$entity_type]['property']) ? TRUE : FALSE;
+    return in_array($property, $this->need[$entity_type]['properties']) && !empty($this->need[$entity_type]['properties'][$property]) ? TRUE : FALSE;
   }
 
 }
