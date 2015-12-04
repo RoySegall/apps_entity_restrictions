@@ -47,7 +47,7 @@ before_script:
   - ln -s $(readlink -e $(cd -)) drupal/drupal/sites/all/modules/apps_entity_restrictions
   - cd drupal/drupal
   - ls -al
-  - drush --yes pm-enable apps_entity_restrictions --verbose
+  - drush --yes pm-enable apps_entity_restrictions
 
   # start a web server on port 8080, run in the background; wait for initialization
   - drush runserver 127.0.0.1:8080 > ~/php-server.log 2>&1 &
