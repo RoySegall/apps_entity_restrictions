@@ -55,6 +55,5 @@ before_script:
 
   # start a web server on port 8080, run in the background; wait for initialization
   - drush runserver 127.0.0.1:8080 > ~/php-server.log 2>&1 &
-  - sleep 3
 
-script: drush test-run 'Apps entity restrictions' --uri=http://127.0.0.1:8080
+script: php scripts/run-tests.sh --php $(which php) --concurrency 4 --verbose --color --url 127.0.0.1:8080 'Apps entity restrictions' 2>&1 | tee /tmp/simpletest-result.txt
