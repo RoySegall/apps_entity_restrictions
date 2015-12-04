@@ -21,9 +21,8 @@ mysql:
 addons:
   apt:
     packages:
-      - php5-cgi
-      - php5-mysql
-
+    - php5-cgi
+    - php5-mysql
 
 install:
 
@@ -32,21 +31,26 @@ install:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
 
   # install drush globally
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - composer global require drush/drush:7.0
+  - phpenv rehash
 
 before_script:
+  - pwd
+
   # navigate out of module directory to prevent blown stack by recursive module
   # lookup
   - cd ../..
 
   # create new site, stubbing sendmail path with true to prevent delivery errors
   # and manually resolving drush path
-  - mysql -e 'create database drupal'
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes core-quick-drupal --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --enable=simpletest drupal
+  - pwd
 
   # reference and enable apps_entity_restrictions in build site
   - ln -s $(readlink -e $(cd -)) drupal/drupal/sites/all/modules/apps_entity_restrictions
   - cd drupal/drupal
+  - ls -al
   - drush --yes pm-enable apps_entity_restrictions --verbose
 
   # start a web server on port 8080, run in the background; wait for initialization
