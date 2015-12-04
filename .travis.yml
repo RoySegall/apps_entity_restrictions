@@ -2,16 +2,9 @@ language: php
 sudo: false
 
 php:
-  - 5.3
   - 5.4
   - 5.5
   - 5.6
-  - hhvm
-
-matrix:
-  fast_finish: true
-  allow_failures:
-    - php: hhvm
 
 mysql:
   database: drupal
@@ -24,7 +17,6 @@ addons:
       - php5-cgi
       - php5-mysql
 
-
 install:
 
   # add composer's global bin directory to the path
@@ -32,7 +24,8 @@ install:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
 
   # install drush globally
-  - composer global require drush/drush:7.*
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - composer global require drush/drush:7.0
 
 before_script:
   # navigate out of module directory to prevent blown stack by recursive module
@@ -41,15 +34,15 @@ before_script:
 
   # create new site, stubbing sendmail path with true to prevent delivery errors
   # and manually resolving drush path
-  - mysql -e 'create database drupal'
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes core-quick-drupal --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --enable=simpletest drupal
 
   # reference and enable apps_entity_restrictions in build site
   - ln -s $(readlink -e $(cd -)) drupal/drupal/sites/all/modules/apps_entity_restrictions
   - cd drupal/drupal
+  - ls -al
   - drush --yes pm-enable apps_entity_restrictions
 
   # start a web server on port 8080, run in the background; wait for initialization
-  - drush rs 8080 > ~/php-server.log 2>&1 &
+  - drush runserver 127.0.0.1:8080 > ~/php-server.log 2>&1 &
 
-script: drush test-run 'Apps entity restrictions' --uri=http://127.0.0.1:8080
+script: php scripts/run-tests.sh --php $(which php) --concurrency 4 --verbose --color --url 127.0.0.1:8080 'Apps entity restrictions' 2>&1 | tee /tmp/simpletest-result.txt
