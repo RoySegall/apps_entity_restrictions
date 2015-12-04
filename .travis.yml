@@ -55,6 +55,6 @@ before_script:
 
   # start a web server on port 8080, run in the background; wait for initialization
   - drush runserver 127.0.0.1:8080 > ~/php-server.log 2>&1 &
-  - until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
+  - sleep 3
 
 script: drush test-run 'Apps entity restrictions' --uri=http://127.0.0.1:8080
