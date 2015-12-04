@@ -1,35 +1,31 @@
 language: php
+sudo: false
 
 php:
-  - 5.3
   - 5.4
   - 5.5
   - 5.6
-  - hhvm
-
-matrix:
-  fast_finish: true
-  allow_failures:
-    - php: hhvm
 
 mysql:
   database: drupal
   username: root
   encoding: utf8
 
-before_install:
-  - sudo apt-get update > /dev/null
+addons:
+  apt:
+    packages:
+    - php5-cgi
+    - php5-mysql
 
 install:
-  # install php packages required for running a web server from drush on php 5.3
-  - sudo apt-get install -y --force-yes php5-cgi php5-mysql
 
   # add composer's global bin directory to the path
   # see: https://github.com/drush-ops/drush#install---composer
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
 
   # install drush globally
-  - composer global require drush/drush:7.*
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - composer global require drush/drush:7.0
 
 before_script:
   # navigate out of module directory to prevent blown stack by recursive module
@@ -38,16 +34,15 @@ before_script:
 
   # create new site, stubbing sendmail path with true to prevent delivery errors
   # and manually resolving drush path
-  - mysql -e 'create database drupal'
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes core-quick-drupal --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --enable=simpletest drupal
 
-  # reference and enable travis_ci_drupal_module_example in build site
-  - ln -s $(readlink -e $(cd -)) drupal/drupal/sites/all/modules/travis_ci_drupal_module_example
+  # reference and enable apps_entity_restrictions in build site
+  - ln -s $(readlink -e $(cd -)) drupal/drupal/sites/all/modules/apps_entity_restrictions
   - cd drupal/drupal
-  - drush --yes pm-enable travis_ci_drupal_module_example
+  - ls -al
+  - drush --yes pm-enable apps_entity_restrictions
 
   # start a web server on port 8080, run in the background; wait for initialization
-  - drush runserver 127.0.0.1:8080 &
-  - until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
+  - drush runserver 127.0.0.1:8080 > ~/php-server.log 2>&1 &
 
-script: drush test-run 'Apps entity restrictions' --uri=http://127.0.0.1:8080
+script: php scripts/run-tests.sh --php $(which php) --concurrency 4 --verbose --color --url 127.0.0.1:8080 'Apps entity restrictions' 2>&1 | tee /tmp/simpletest-result.txt
