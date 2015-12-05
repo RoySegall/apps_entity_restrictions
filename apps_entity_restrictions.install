@@ -64,12 +64,6 @@ function apps_entity_restrictions_schema() {
         'description' => 'The secret of the app.',
         'type' => 'text',
       ),
-      'metadata' => array(
-        'description' => 'Holds metadata information about the app.',
-        'type' => 'blob',
-        'size' => 'big',
-        'serialize' => TRUE,
-      ),
     ),
     'primary key' => array('id'),
   );
