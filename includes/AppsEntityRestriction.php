@@ -218,7 +218,7 @@ class AppsEntityRestriction extends Entity {
     }
 
     // Remove after changing the form to keep just the arrays of the methods.
-    return in_array($property, $this->need[$entity_type]['properties']) && !empty($this->need[$entity_type]['properties'][$property]) ? TRUE : FALSE;
+    return in_array($property, $this->need[$entity_type]['properties']) ? TRUE : FALSE;
   }
 
 }

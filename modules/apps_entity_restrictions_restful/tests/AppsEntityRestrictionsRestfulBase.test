@@ -28,13 +28,6 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
   protected $term;
 
   /**
-   * @var string
-   *
-   * The field tags name.
-   */
-  protected $fieldName;
-
-  /**
    * {@inheritdoc}
    */
   public function setUp() {
@@ -59,21 +52,23 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
     );
     taxonomy_vocabulary_save($vocabulary);
 
-    $this->fieldName = 'field_' . $vocabulary->machine_name;
+    if (!field_info_field('field_tags')) {
+      $field = array(
+        'field_name' => 'field_tags',
+        'type' => 'taxonomy_term_reference',
+        'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      );
+      field_create_field($field);
+    }
 
-    $field = array(
-      'field_name' => $this->fieldName,
-      'type' => 'taxonomy_term_reference',
-      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
-    );
-    field_create_field($field);
-
-    $instance = array(
-      'field_name' => $this->fieldName,
-      'entity_type' => 'node',
-      'bundle' => 'article',
-    );
-    field_create_instance($instance);
+    if (!field_info_instance('node', 'field_tags', 'article')) {
+      $instance = array(
+        'field_name' => 'field_tags',
+        'entity_type' => 'node',
+        'bundle' => 'article',
+      );
+      field_create_instance($instance);
+    }
 
     // Crete a term in the vocabulary.
     $this->term = new stdClass();
@@ -90,13 +85,14 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
     // Create a node and populate fields for testing.
     $node = $this->drupalcreateNode(array('type' => 'article'));
     $wrapper = entity_metadata_wrapper('node', $node);
-    $wrapper->{$this->fieldName}->set(array($this->term->tid));
+    $wrapper->field_tags->set(array($this->term->tid));
     $wrapper->body->set(array('value' => $this->randomString()));
     $wrapper->save();
 
     // Verify the field is populated.
-    $this->assertTrue($wrapper->{$this->fieldName}->value(array('identifier' => TRUE)), 'The taxonomy reference field is populated.');
+    $this->assertTrue($wrapper->field_tags->value(array('identifier' => TRUE)), 'The taxonomy reference field is populated.');
 
+    /** @var AppsEntityRestrictionsRestfulBaseNode $handler */
     $handler = restful_get_restful_handler('aer_articles');
 
     try {
@@ -106,13 +102,20 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
       $this->pass('The request failed since the app credentials was not available.');
     }
 
-    // Committing the request using drupalGet and not $handler->process() since
-    // the app credentials loaded from the headers and not from the handler
-    // controller.
-    $content = $this->drupalGet('api/aer_articles', array('query' => array('public' => $this->app->app_key, 'secret' => $this->app->app_secret)));
+    $content = $handler->setApp($this->app)->get($node->nid);
 
-    // Verify we don't get the terms field.
-//    debug($content['data']);
+    // Verify we got the allowed fields.
+    $result = $content[0];
+    $this->assertTrue(empty($result['tags']) && !empty($result['body']), 'The field body was return and the fields tags not.');
+
+    // Set the tags field as optional for the app and check we got it.
+    $this->app->need['node']['properties'][] = 'field_tags';
+    $this->app->save();
+
+    // Do the same request again and see we got the tags and the body.
+    $content = $handler->setApp($this->app)->get($node->nid);
+    $result = $content[0];
+    $this->assertTrue(!empty($result['tags']) && !empty($result['body']), 'The field body and the fields tags returned.');
   }
 
 }

@@ -8,6 +8,13 @@
 class AppsEntityRestrictionsRestful {
 
   /**
+   * @var AppsEntityRestrictionsRestful
+   *
+   * Hold cached object of the current application.
+   */
+  static $app;
+
+  /**
    * Check if we in a restful context.
    *
    * @return bool
@@ -62,6 +69,10 @@ class AppsEntityRestrictionsRestful {
    * @throws RestfulBadRequestException
    */
   static public function loadByHeaders($request = NULL) {
+    if (self::$app) {
+      return self::$app;
+    }
+
     $keys = self::getHeadersKeys();
 
     if (!$request) {
@@ -75,7 +86,8 @@ class AppsEntityRestrictionsRestful {
     $public = $request['__application'][$keys['public']];
     $secret = $request['__application'][$keys['secret']];
 
-    return apps_entity_restrictions_load_by_keys($public, $secret);
+    self::$app = apps_entity_restrictions_load_by_keys($public, $secret);
+    return self::$app;
   }
 
   /**
