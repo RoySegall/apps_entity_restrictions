@@ -194,13 +194,16 @@ function apps_entity_restrictions_app_form_submit($form, &$form_state) {
   $need = array();
 
   foreach ($entities as $entity) {
-    if (empty($values[$entity])) {
+    if (in_array($entity, apps_entity_restrictions_ignored_apps())) {
+      continue;
+    }
+
+    if (!$values[$entity][$entity . '_need']) {
       // Entity was not selected.
       continue;
     }
 
     $methods = $values[$entity]['exposed']['methods'];
-    // todo keep flat array and not ['post' => 0, 'get' => 'get']
     $properties = $values[$entity]['exposed']['properties'];
 
     if (!apps_entity_restrictions_is_selected($values[$entity]['exposed'])) {
@@ -208,8 +211,8 @@ function apps_entity_restrictions_app_form_submit($form, &$form_state) {
     }
 
     $need[$entity] = array(
-      'methods' => $methods,
-      'properties' => $properties,
+      'methods' => array_filter(array_values($methods)),
+      'properties' => array_filter(array_values($properties)),
     );
   }
 

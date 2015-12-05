@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Manage here all the pages which not relate to CRUD functionallity.
+ * Manage here all the pages which not relate to CRUD functionality.
  */
 
 /**
@@ -37,8 +37,8 @@ function apps_entity_restrictions_main_app_page() {
       $items[] = $app->generateLink('edit');
       $items[] = $app->generateLink('delete');
 
-      if (!$app->status) {
-        $items[] = $app->generateLink('approve');
+      if (module_exists('devel') && user_access('access devel information')) {
+        $items[] = $app->generateLink('devel');
       }
 
       // Let other module add their own links.
@@ -46,7 +46,7 @@ function apps_entity_restrictions_main_app_page() {
 
       $rows[] = array(
         $app->title . '<br />' . $app->description,
-        t('Key: @key<br />Secret: @secret<br />Site: @site', $params),
+        t('Key: @key<br />Secret: @secret', $params),
         theme('item_list', array(
           'items' => $items,
           'attributes' => array('class' => array('links', 'inline')),

@@ -99,9 +99,9 @@ class AppsEntityRestriction extends Entity {
         'title' => t('Delete'),
         'href' => 'admin/apps/' . $this->id . '/delete',
       ),
-      'approve' => array(
-        'title' => t('Approve app'),
-        'href' => 'admin/apps/' . $this->id . '/approve',
+      'devel' => array(
+        'title' => t('Devel'),
+        'href' => 'admin/apps/' . $this->id . '/devel',
       ),
     );
 
