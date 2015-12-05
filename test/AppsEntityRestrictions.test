@@ -26,13 +26,12 @@ class AppsEntityRestrictionsBase extends DrupalWebTestCase {
     parent::setUp(array('apps_entity_restrictions'));
 
     $this->app = apps_entity_restrictions_create();
-    $this->app->setNeed(array(
-      'node' => array(
-        'methods' => array('get'),
-        'properties' => array('nid', 'body'),
-      ),
-    ));
-    $this->app->save();
+    $this->app
+      ->setTitle('Demo application')
+      ->allow('node', 'methods', 'get')
+      ->allow('node', 'properties', 'nid')
+      ->allow('node', 'properties', 'body')
+      ->save();
   }
 
   /**

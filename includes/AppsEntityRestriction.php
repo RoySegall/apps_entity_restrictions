@@ -243,7 +243,7 @@ class AppsEntityRestriction extends Entity {
   }
 
   /**
-   * Adding a info to the need key.
+   * Add permission to application.
    *
    * @param $entity
    *   The entity type.
@@ -254,13 +254,13 @@ class AppsEntityRestriction extends Entity {
    *
    * @return AppsEntityRestriction
    */
-  public function addNeed($entity, $realm, $property) {
+  public function allow($entity, $realm, $property) {
     $this->need[$entity][$realm][] = $property;
     return $this;
   }
 
   /**
-   * Removing a info from the need key.
+   * Remove application permission.
    *
    * @param $entity
    *   The entity type.
@@ -271,7 +271,7 @@ class AppsEntityRestriction extends Entity {
    *
    * @return AppsEntityRestriction
    */
-  public function removeNeed($entity, $realm, $property) {
+  public function restrict($entity, $realm, $property) {
     $property_key = array_search($property, $this->need[$entity][$realm]);
     unset($this->need[$entity][$realm][$property_key]);
     return $this;
@@ -375,7 +375,6 @@ class AppsEntityRestriction extends Entity {
       return FALSE;
     }
 
-    // Remove after changing the form to keep just the arrays of the methods.
     return in_array($property, $this->need[$entity_type]['properties']) ? TRUE : FALSE;
   }
 

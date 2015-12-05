@@ -18,15 +18,12 @@ Except for a nice UI under `admin/structure/apps` there is a nice API.
 Create a new application:
 ```php
 <?php
-$app = apps_entity_restrictions_create();
-$app->title = 'Demo application';
-$app->need = array(
-  'node' => array(
-    'methods' => array('get'),
-    'property' => array('nid', 'body'),
-  ),
-);
-$app->save();
+$app
+  ->setTitle('Demo application')
+  ->allow('node', 'methods', 'get')
+  ->allow('node', 'properties', 'nid')
+  ->allow('node', 'properties', 'body')
+  ->save();
 ```
 
 Loading an application by keys:
@@ -59,4 +56,47 @@ if (!$app->entityPropertyAccess('get', 'node', 'field_date')) {
   drupal_set_message(t("This apps have no access in GET request for the node's date field.", 'error'));
 }
 
+```
+
+## Restful integration
+Your [restful](http://drupal.org/project/restful) endpoints could also benefit
+ from the logic of Apps entity restrictions. You'd need to enable the module
+ `Apps entity restrictions Restful`. The module come with couple of base classed:
+ * `AppsEntityRestrictionsRestfulBase` - extends `RestfulEntityBase`
+ * `AppsEntityRestrictionsRestfulBaseNode` - extends `RestfulEntityBaseNode`
+ * `AppsEntityRestrictionsRestfulBaseTaxonomyTerm` - extends `RestfulEntityBaseTaxonomyTerm`
+ * `AppsEntityRestrictionsRestfulMultipleBundles` - extends `RestfulEntityBaseMultipleBundles`
+
+ The extension was needed for two reasons:
+ * Add to the access methods the entity access logic of Apps entity
+ restrictions.
+ * Add to each public field definition from `parent::publicFieldsInfo` callback
+ access.
+
+Your end point would need define more public fields. In order to wrap them
+easily with the access callback you could implement the public fields info
+similar to this:
+```php
+<?php
+class AppsEntityRestrictionsExampleArticle extends AppsEntityRestrictionsRestfulBaseNode {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function publicFieldsInfo() {
+    $fields = parent::publicFieldsInfo();
+
+    $fields['body'] = array(
+      'property' => 'body',
+    );
+
+    // Should be exposed by default.
+    $fields['tags'] = array(
+      'property' => 'field_tags',
+    );
+
+    return AppsEntityRestrictionsRestful::publicFieldsInfo($this, $fields);
+  }
+
+}
 ```
