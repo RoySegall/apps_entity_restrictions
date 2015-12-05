@@ -9,74 +9,273 @@
 class AppsEntityRestriction extends Entity {
 
   /**
-   * @var
+   * @var integer
    *
    * The primary identifier for a applications.
    */
   public $id;
 
   /**
-   * @var
+   * @var string
    *
    * The title of this application.
    */
   public $title;
 
   /**
-   * @var
+   * @var string
    *
    * A description of the application.
    */
   public $description;
 
   /**
-   * @var
+   * @var string
    *
    * The unix time stamp the app was created.
    */
   public $time;
 
   /**
-   * @var
+   * @var integer
    *
    * The {users}.uid that owns this application.
    */
   public $uid;
 
   /**
-   * @var
+   * @var bool
    *
    * The status of the app.
    */
   public $status;
 
   /**
-   * @var
+   * @var array
    *
    * The entity types from which the app will fetch the data.
    */
   public $need;
 
   /**
-   * @var
+   * @var string
    *
    * The key of the app.
    */
   public $app_key;
 
   /**
-   * @var
+   * @var string
    *
    * The secret of the app.
    */
   public $app_secret;
 
   /**
-   * @var
-   *
-   * Holds metadata information about the app.
+   * @return string
    */
-  public $metadata;
+  public function getId() {
+    return $this->id;
+  }
+
+  /**
+   * @param integer $id
+   *   The identifier of the application.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function setId($id) {
+    $this->id = $id;
+
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getTitle() {
+    return $this->title;
+  }
+
+  /**
+   * @param string $title
+   *   The application title.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function setTitle($title) {
+    $this->title = $title;
+
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getDescription() {
+    return $this->description;
+  }
+
+  /**
+   * @param string $description
+   *   description of the application.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function setDescription($description) {
+    $this->description = $description;
+
+    return $this;
+  }
+
+  /**
+   * @return integer
+   */
+  public function getTime() {
+    return $this->time;
+  }
+
+  /**
+   * @param integer $time
+   *   Timestamp of the creation.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function setTime($time) {
+    $this->time = $time;
+
+    return $this;
+  }
+
+  /**
+   * @return integer
+   */
+  public function getUid() {
+    return $this->uid;
+  }
+
+  /**
+   * @param integer $uid
+   *   The owner's ID.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function setUid($uid) {
+    $this->uid = $uid;
+
+    return $this;
+  }
+
+  /**
+   * @return bool
+   */
+  public function getStatus() {
+    return $this->status;
+  }
+
+  /**
+   * @param bool $status
+   *   Determine if the application active or not.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function setStatus($status) {
+    $this->status = $status;
+
+    return $this;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getNeed() {
+    return $this->need;
+  }
+
+  /**
+   * @param array $need
+   *   The restrictions settings.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function setNeed($need) {
+    $this->need = $need;
+
+    return $this;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getAppKey() {
+    return $this->app_key;
+  }
+
+  /**
+   * @param string $app_key
+   *   The application public key.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function setAppKey($app_key) {
+    $this->app_key = $app_key;
+
+    return $this;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getAppSecret() {
+    return $this->app_secret;
+  }
+
+  /**
+   * @param string $app_secret
+   *   The secret key.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function setAppSecret($app_secret) {
+    $this->app_secret = $app_secret;
+
+    return $this;
+  }
+
+  /**
+   * Add permission to application.
+   *
+   * @param $entity
+   *   The entity type.
+   * @param $realm
+   *   The realm - properties or methods.
+   * @param $property
+   *   The field name.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function allow($entity, $realm, $property) {
+    $this->need[$entity][$realm][] = $property;
+    return $this;
+  }
+
+  /**
+   * Remove application permission.
+   *
+   * @param $entity
+   *   The entity type.
+   * @param $realm
+   *   The realm - properties or methods.
+   * @param $property
+   *   The field name.
+   *
+   * @return AppsEntityRestriction
+   */
+  public function restrict($entity, $realm, $property) {
+    $property_key = array_search($property, $this->need[$entity][$realm]);
+    unset($this->need[$entity][$realm][$property_key]);
+    return $this;
+  }
 
   /**
    * Generating links of the app.
@@ -99,9 +298,9 @@ class AppsEntityRestriction extends Entity {
         'title' => t('Delete'),
         'href' => 'admin/apps/' . $this->id . '/delete',
       ),
-      'approve' => array(
-        'title' => t('Approve app'),
-        'href' => 'admin/apps/' . $this->id . '/approve',
+      'devel' => array(
+        'title' => t('Devel'),
+        'href' => 'admin/apps/' . $this->id . '/devel',
       ),
     );
 
@@ -122,33 +321,7 @@ class AppsEntityRestriction extends Entity {
     $user = user_load($this->uid);
 
     $this->app_key = str_replace(array(' ', '', '-'), '_', strtolower($this->title));
-    $this->app_secret = md5($user->name . $this->time);
-  }
-
-  /**
-   * Get a metadata value.
-   *
-   * @param $name
-   *   The name of the metadata.
-   */
-  public function getMetaData($name) {
-    return $this->metadata[$name];
-  }
-
-  /**
-   * Set metadata information.
-   *
-   * @param $name
-   *   The name of the metadata.
-   * @param $value
-   *   The value of the metadata.
-   *
-   * @return AppsEntityRestriction
-   */
-  public function setMetaData($name, $value) {
-    $this->metadata[$name] = $value;
-
-    return $this;
+    $this->app_secret = md5($user->name . $this->time . $this->app_key);
   }
 
   /**
@@ -162,21 +335,6 @@ class AppsEntityRestriction extends Entity {
     }
 
     return parent::save();
-  }
-
-  /**
-   * Check if the app support a specific method.
-   *
-   * @param string $data
-   *   The entity type: node, user, comments etc. etc. etc.
-   * @param string $method
-   *   The method type: get, post.
-   *
-   * @return bool
-   *   True or false if the app support this type of method.
-   */
-  public function supportMethod($data, $method) {
-    return !empty($this->need[$data]['methods'][$method]);
   }
 
   /**
@@ -217,7 +375,6 @@ class AppsEntityRestriction extends Entity {
       return FALSE;
     }
 
-    // Remove after changing the form to keep just the arrays of the methods.
     return in_array($property, $this->need[$entity_type]['properties']) ? TRUE : FALSE;
   }
 

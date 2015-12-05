@@ -35,14 +35,12 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
 
     // Create application.
     $this->app = apps_entity_restrictions_create();
-    $this->app->title = 'Demo application';
-    $this->app->need = array(
-      'node' => array(
-        'methods' => array('get'),
-        'properties' => array('nid', 'body'),
-      ),
-    );
-    $this->app->save();
+    $this->app
+      ->setTitle('Demo application')
+      ->allow('node', 'methods', 'get')
+      ->allow('node', 'properties', 'nid')
+      ->allow('node', 'properties', 'body')
+      ->save();
 
     // Create the field tags field.
     $vocabulary = (object) array(
@@ -109,7 +107,7 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
     $this->assertTrue(empty($result['tags']) && !empty($result['body']), 'The field body was return and the fields tags not.');
 
     // Set the tags field as optional for the app and check we got it.
-    $this->app->need['node']['properties'][] = 'field_tags';
+    $this->app->allow('node', 'properties', 'field_tags');
     $this->app->save();
 
     // Do the same request again and see we got the tags and the body.

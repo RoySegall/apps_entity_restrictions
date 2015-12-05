@@ -17,7 +17,7 @@ class AppsEntityRestrictionsExampleArticle extends AppsEntityRestrictionsRestful
       'property' => 'body',
     );
 
-    // Should be exposed by default.
+    // Should be exposed by default but in this example it won't.
     $fields['tags'] = array(
       'property' => 'field_tags',
     );
