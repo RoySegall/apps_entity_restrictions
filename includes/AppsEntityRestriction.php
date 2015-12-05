@@ -13,63 +13,63 @@ class AppsEntityRestriction extends Entity {
    *
    * The primary identifier for a applications.
    */
-  protected $id;
+  public $id;
 
   /**
    * @var string
    *
    * The title of this application.
    */
-  protected $title;
+  public $title;
 
   /**
    * @var string
    *
    * A description of the application.
    */
-  protected $description;
+  public $description;
 
   /**
    * @var string
    *
    * The unix time stamp the app was created.
    */
-  protected $time;
+  public $time;
 
   /**
    * @var integer
    *
    * The {users}.uid that owns this application.
    */
-  protected $uid;
+  public $uid;
 
   /**
    * @var bool
    *
    * The status of the app.
    */
-  protected $status;
+  public $status;
 
   /**
    * @var array
    *
    * The entity types from which the app will fetch the data.
    */
-  protected $need;
+  public $need;
 
   /**
    * @var string
    *
    * The key of the app.
    */
-  protected $app_key;
+  public $app_key;
 
   /**
    * @var string
    *
    * The secret of the app.
    */
-  protected $app_secret;
+  public $app_secret;
 
   /**
    * @return string
@@ -288,7 +288,7 @@ class AppsEntityRestriction extends Entity {
    * @return string
    *   The link for the action.
    */
-  protected function generateLink($action, $account = NULL) {
+  public function generateLink($action, $account = NULL) {
     $actions = array(
       'edit' => array(
         'title' => t('Edit'),
@@ -317,7 +317,7 @@ class AppsEntityRestriction extends Entity {
   /**
    * Generate key and secret keys for a new application.
    */
-  protected function generateKeyAndSecret() {
+  public function generateKeyAndSecret() {
     $user = user_load($this->uid);
 
     $this->app_key = str_replace(array(' ', '', '-'), '_', strtolower($this->title));
