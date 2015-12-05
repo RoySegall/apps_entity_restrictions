@@ -37,7 +37,7 @@ Checking access:
 <?php
 // Check general access.
 try {
-  $app->entityAccess('POST', 'user');
+  $app->entityAccess('get', 'user');
 } catch (\AppsEntityRestrictionsException $e) {
   drupal_set_message(t('This apps have no support to the user entity.', 'error'));
 }
@@ -61,16 +61,17 @@ if (!$app->entityPropertyAccess('get', 'node', 'field_date')) {
 ## Restful integration
 Your [restful](http://drupal.org/project/restful) endpoints could also benefit
  from the logic of Apps entity restrictions. You'd need to enable the module
- `Apps entity restrictions Restful`. The module come with couple of base classed:
+ `Apps entity restrictions Restful`. The module come with couple of base classes:
  * `AppsEntityRestrictionsRestfulBase` - extends `RestfulEntityBase`
  * `AppsEntityRestrictionsRestfulBaseNode` - extends `RestfulEntityBaseNode`
  * `AppsEntityRestrictionsRestfulBaseTaxonomyTerm` - extends `RestfulEntityBaseTaxonomyTerm`
  * `AppsEntityRestrictionsRestfulMultipleBundles` - extends `RestfulEntityBaseMultipleBundles`
 
+
  The extension was needed for two reasons:
- * Add to the access methods the entity access logic of Apps entity
+ * Add to the access method the entity access logic of Apps entity
  restrictions.
- * Add to each public field definition from `parent::publicFieldsInfo` callback
+ * Add to each public field definition from `parent::publicFieldsInfo` a callback
  access.
 
 Your end point would need define more public fields. In order to wrap them
@@ -78,6 +79,7 @@ easily with the access callback you could implement the public fields info
 similar to this:
 ```php
 <?php
+
 class AppsEntityRestrictionsExampleArticle extends AppsEntityRestrictionsRestfulBaseNode {
 
   /**
@@ -90,7 +92,6 @@ class AppsEntityRestrictionsExampleArticle extends AppsEntityRestrictionsRestful
       'property' => 'body',
     );
 
-    // Should be exposed by default.
     $fields['tags'] = array(
       'property' => 'field_tags',
     );
