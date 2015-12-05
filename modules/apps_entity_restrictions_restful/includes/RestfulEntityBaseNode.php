@@ -12,6 +12,8 @@ class AppsEntityRestrictionsRestfulBaseNode extends RestfulEntityBaseNode {
 
   /**
    * @var AppsEntityRestriction
+   *
+   * The application instance.
    */
   protected $app;
 

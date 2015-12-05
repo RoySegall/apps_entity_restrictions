@@ -15,7 +15,7 @@ function apps_entity_restrictions_example_install() {
   $app->need = array(
     'node' => array(
       'methods' => array('get'),
-      'property' => array('nid', 'body'),
+      'properties' => array('nid', 'body'),
     ),
   );
   $app->save();

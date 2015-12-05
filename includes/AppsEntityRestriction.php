@@ -151,6 +151,11 @@ class AppsEntityRestriction extends Entity {
     return $this;
   }
 
+  /**
+   * Overrides Entity::save().
+   *
+   * Generate credentials when not provided.
+   */
   public function save() {
     if (empty($this->app_key) || empty($this->app_secret)) {
       $this->generateKeyAndSecret();
@@ -158,7 +163,6 @@ class AppsEntityRestriction extends Entity {
 
     return parent::save();
   }
-
 
   /**
    * Check if the app support a specific method.
@@ -190,7 +194,7 @@ class AppsEntityRestriction extends Entity {
     $entity_info = entity_get_info($entity_type);
 
     if (empty($this->need[$entity_type])) {
-      throw new AppsEntityRestrictionsException(format_string('The app does not handle @name', array('@name' => $op)));
+      throw new AppsEntityRestrictionsException(format_string('The app does not handle @name', array('@name' => $entity_info['label'])));
     }
 
     return in_array($op, $this->need[$entity_type]['methods']) && $this->need[$entity_type]['methods'][$op] ? TRUE : FALSE;
@@ -213,6 +217,7 @@ class AppsEntityRestriction extends Entity {
       return FALSE;
     }
 
+    // Remove after changing the form to keep just the arrays of the methods.
     return in_array($property, $this->need[$entity_type]['properties']) && !empty($this->need[$entity_type]['properties'][$property]) ? TRUE : FALSE;
   }
 

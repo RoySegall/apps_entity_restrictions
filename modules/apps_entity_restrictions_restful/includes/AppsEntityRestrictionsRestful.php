@@ -87,8 +87,6 @@ class AppsEntityRestrictionsRestful {
    *
    * @return array
    *   The list of public fields with the access callback array.
-   *
-   * @throws RestfulBadRequestException
    */
   static public function publicFieldsInfo(RestfulBase $plugin, $fields) {
 

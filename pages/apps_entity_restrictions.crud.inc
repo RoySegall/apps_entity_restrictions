@@ -200,6 +200,7 @@ function apps_entity_restrictions_app_form_submit($form, &$form_state) {
     }
 
     $methods = $values[$entity]['exposed']['methods'];
+    // todo keep flat array and not ['post' => 0, 'get' => 'get']
     $properties = $values[$entity]['exposed']['properties'];
 
     if (!apps_entity_restrictions_is_selected($values[$entity]['exposed'])) {

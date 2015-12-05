@@ -7,6 +7,9 @@
 
 class AppsEntityRestrictionsExampleArticle extends AppsEntityRestrictionsRestfulBaseNode {
 
+  /**
+   * {@inheritdoc}
+   */
   public function publicFieldsInfo() {
     $fields = parent::publicFieldsInfo();
 
