@@ -53,19 +53,29 @@ class AppsEntityRestrictionsRestful {
   /**
    * Loading the app by the headers.
    *
+   * @param $request
+   *   Passing Restful request object. When not empty the credentials will be
+   *   calculated from the variable and not from the headers.
+   *
    * @return AppsEntityRestriction
    *
    * @throws RestfulBadRequestException
    */
-  static public function loadByHeaders() {
-    if (!self::applicationCredentialExists()) {
-      throw new RestfulBadRequestException("You need to provide the application's credentials.");
+  static public function loadByHeaders($request = NULL) {
+    $keys = self::getHeadersKeys();
+
+    if (!$request) {
+      if (!self::applicationCredentialExists()) {
+        throw new RestfulBadRequestException("You need to provide the application's credentials.");
+      }
+
+      $request = restful_parse_request();
     }
 
-    $keys = self::getHeadersKeys();
-    $request = restful_parse_request();
+    $public = $request['__application'][$keys['public']];
+    $secret = $request['__application'][$keys['secret']];
 
-    return apps_entity_restrictions_load_by_keys($request['__application'][$keys['public']], $request['__application'][$keys['secret']]);
+    return apps_entity_restrictions_load_by_keys($public, $secret);
   }
 
   /**
@@ -108,6 +118,7 @@ class AppsEntityRestrictionsRestful {
    * @return bool
    */
   static public function accessCallbacks($op, $public_field_name, EntityMetadataWrapper $property_wrapper, EntityMetadataWrapper $wrapper) {
+
     if (!$app = self::loadByHeaders()) {
       // No application info available. Return early.
       return RestfulInterface::ACCESS_IGNORE;

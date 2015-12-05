@@ -32,8 +32,8 @@ class AppsEntityRestrictionsRestfulBaseNode extends RestfulEntityBaseNode {
   public function access() {
     $access = parent::access();
 
-    if (!$this->app = AppsEntityRestrictionsRestful::loadByHeaders()) {
-      throw new \RestfulBadRequestException('Application with the passed credential was not found. Please try again.');
+    if (!$this->app = AppsEntityRestrictionsRestful::loadByHeaders($this->request)) {
+      return FALSE;
     }
 
     return $access && $this->app->entityAccess(strtolower($this->getMethod()), $this->getEntityType());
