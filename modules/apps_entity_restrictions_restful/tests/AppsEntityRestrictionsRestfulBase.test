@@ -11,7 +11,7 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
     return array(
       'name' => 'Apps entity restrictions restful basic',
       'description' => 'Test apps entity restrictions restful basic logic.',
-      'group' => 'Apps entity restrictions restful',
+      'group' => 'Apps entity restrictions',
     );
   }
 
