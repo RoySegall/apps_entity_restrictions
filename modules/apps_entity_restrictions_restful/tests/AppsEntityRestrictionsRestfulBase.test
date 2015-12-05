@@ -1,0 +1,111 @@
+<?php
+
+/**
+ * @file
+ * Contains \AppsEntityRestrictionsRestfulBaseTest.
+ */
+
+class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Apps entity restrictions restful basic',
+      'description' => 'Test apps entity restrictions restful basic logic.',
+      'group' => 'Apps entity restrictions restful',
+    );
+  }
+
+  /**
+   * @var AppsEntityRestriction
+   */
+  protected $app;
+
+  /**
+   * @var StdClass
+   *
+   * The term object.
+   */
+  protected $term;
+
+  /**
+   * @var string
+   *
+   * The field tags name.
+   */
+  protected $fieldName;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp(array('apps_entity_restrictions_example'));
+
+    // Create application.
+    $this->app = apps_entity_restrictions_create();
+    $this->app->title = 'Demo application';
+    $this->app->need = array(
+      'node' => array(
+        'methods' => array('get'),
+        'properties' => array('nid', 'body'),
+      ),
+    );
+    $this->app->save();
+
+    // Create the field tags field.
+    $vocabulary = (object) array(
+      'name' => $this->randomName(),
+      'description' => $this->randomName(),
+      'machine_name' => strtolower($this->randomName()),
+    );
+    taxonomy_vocabulary_save($vocabulary);
+
+    $this->fieldName = 'field_' . $vocabulary->machine_name;
+
+    $field = array(
+      'field_name' => $this->fieldName,
+      'type' => 'taxonomy_term_reference',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'field_name' => $this->fieldName,
+      'entity_type' => 'node',
+      'bundle' => 'article',
+    );
+    field_create_instance($instance);
+
+    // Crete a term in the vocabulary.
+    $this->term = new stdClass();
+    $this->term->name = $this->randomName();
+    $this->term->vid = $vocabulary->vid;
+    taxonomy_term_save($this->term);
+  }
+
+  /**
+   * Verify AppsEntityRestrictionsRestful::accessCallbacks() applies the
+   * restriction logic.
+   */
+  public function testBasicRestrictions() {
+    $node = $this->drupalcreateNode(array('type' => 'article'));
+    $wrapper = entity_metadata_wrapper('node', $node);
+    $wrapper->{$this->fieldName}->set(array($this->term->tid));
+    $wrapper->save();
+
+    // Verify the field is populated.
+    $this->assertTrue($wrapper->{$this->fieldName}->value(array('identifier' => TRUE)), 'The taxonomy reference field is populated.');
+
+    $handler = restful_get_restful_handler('aer_articles');
+
+    try {
+      $handler->process();
+      $this->fail('The request did not failed since the app credentials was not available.');
+    } catch (\RestfulException $e) {
+      $this->pass('The request failed since the app credentials was not available.');
+    }
+
+    // Make the request. This time with the correct credentials.
+    $handler->process('', array('public' => $this->app->app_key, 'secret' => $this->app->app_secret));
+  }
+
+}

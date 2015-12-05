@@ -39,6 +39,7 @@ before_script:
   # reference and enable apps_entity_restrictions in build site
   - ln -s $(readlink -e $(cd -)) drupal/drupal/sites/all/modules/apps_entity_restrictions
   - cd drupal/drupal
+  - drush dl restful-7.x-1.6
   - ls -al
   - drush --yes pm-enable apps_entity_restrictions
 

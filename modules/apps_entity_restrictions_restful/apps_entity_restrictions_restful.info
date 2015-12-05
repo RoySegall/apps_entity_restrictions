@@ -6,9 +6,15 @@ core = 7.x
 dependencies[] = apps_entity_restrictions
 dependencies[] = restful
 
+; Static methods.
 files[] = includes/AppsEntityRestrictionsRestful.php
+
+; Restful base class overrides.
 files[] = includes/RestfulEntityBase.php
 files[] = includes/RestfulEntityBaseMultipleBundles.php
 files[] = includes/RestfulEntityBaseNode.php
 files[] = includes/RestfulEntityBaseTaxonomyTerm.php
 files[] = includes/RestfulEntityBaseUser.php
+
+; Tests
+files[] = tests/AppsEntityRestrictionsRestfulBase.test

@@ -9,7 +9,7 @@
  * Implements hook_install().
  */
 function apps_entity_restrictions_example_install() {
-  // Creating example apps.
+  // Creating example application.
   $app = apps_entity_restrictions_create();
   $app->title = 'Demo application';
   $app->need = array(
