@@ -31,7 +31,7 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    parent::setUp(array('apps_entity_restrictions', 'apps_entity_restrictions_example'));
+    parent::setUp(array('apps_entity_restrictions_example'));
 
     // Create application.
     $this->app = apps_entity_restrictions_create();
