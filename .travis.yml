@@ -41,7 +41,7 @@ before_script:
   - cd drupal/drupal
   - drush dl restful-7.x-1.6
   - ls -al
-  - drush --yes pm-enable apps_entity_restrictions
+  - drush --yes pm-enable apps_entity_restrictions apps_entity_restrictions_restful
 
   # start a web server on port 8080, run in the background; wait for initialization
   - drush runserver 127.0.0.1:8080 > ~/php-server.log 2>&1 &
