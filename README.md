@@ -60,19 +60,19 @@ if (!$app->entityPropertyAccess('get', 'node', 'field_date')) {
 
 ## Restful integration
 Your [restful](http://drupal.org/project/restful) endpoints could also benefit
- from the logic of Apps entity restrictions. You'd need to enable the module
- `Apps entity restrictions Restful`. The module come with couple of base classes:
- * `AppsEntityRestrictionsRestfulBase` - extends `RestfulEntityBase`
- * `AppsEntityRestrictionsRestfulBaseNode` - extends `RestfulEntityBaseNode`
- * `AppsEntityRestrictionsRestfulBaseTaxonomyTerm` - extends `RestfulEntityBaseTaxonomyTerm`
- * `AppsEntityRestrictionsRestfulMultipleBundles` - extends `RestfulEntityBaseMultipleBundles`
+from the logic of Apps entity restrictions. You'd need to enable the module
+`Apps entity restrictions Restful`. The module come with couple of base classes:
+  * `AppsEntityRestrictionsRestfulBase` - extends `RestfulEntityBase`
+  * `AppsEntityRestrictionsRestfulBaseNode` - extends `RestfulEntityBaseNode`
+  * `AppsEntityRestrictionsRestfulBaseTaxonomyTerm` - extends `RestfulEntityBaseTaxonomyTerm`
+  * `AppsEntityRestrictionsRestfulMultipleBundles` - extends `RestfulEntityBaseMultipleBundles`
 
 
- The extension was needed for two reasons:
- * Add to the access method the entity access logic of Apps entity
- restrictions.
- * Add to each public field definition from `parent::publicFieldsInfo` a callback
- access.
+The extension was needed for two reasons:
+  * Add to the access method the entity access logic of Apps entity
+    restrictions.
+  * Add to each public field definition from `parent::publicFieldsInfo` a callback
+    access.
 
 Your end point would need define more public fields. In order to wrap them
 easily with the access callback you could implement the public fields info
