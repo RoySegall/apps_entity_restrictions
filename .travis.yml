@@ -14,8 +14,8 @@ mysql:
 addons:
   apt:
     packages:
-    - php5-cgi
-    - php5-mysql
+      - php5-cgi
+      - php5-mysql
 
 install:
 
@@ -39,10 +39,14 @@ before_script:
   # reference and enable apps_entity_restrictions in build site
   - ln -s $(readlink -e $(cd -)) drupal/drupal/sites/all/modules/apps_entity_restrictions
   - cd drupal/drupal
+  - drush dl restful-7.x-1.6
   - ls -al
-  - drush --yes pm-enable apps_entity_restrictions
+  - drush --yes pm-enable apps_entity_restrictions apps_entity_restrictions_restful
 
   # start a web server on port 8080, run in the background; wait for initialization
   - drush runserver 127.0.0.1:8080 > ~/php-server.log 2>&1 &
 
-script: php scripts/run-tests.sh --php $(which php) --concurrency 4 --verbose --color --url 127.0.0.1:8080 'Apps entity restrictions' 2>&1 | tee /tmp/simpletest-result.txt
+script:
+  - php scripts/run-tests.sh --php $(which php) --concurrency 4 --verbose --color --url 127.0.0.1:8080 'Apps entity restrictions' 2>&1 | tee /tmp/simpletest-result.txt
+  - egrep -i "([1-9]+ fail)|(Fatal error)|([1-9]+ exception)" /tmp/simpletest-result.txt && exit 1
+  - exit 0

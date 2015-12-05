@@ -1,0 +1,81 @@
+<?php
+
+/**
+ * @file
+ * apps_entity_restrictions_restful.module
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function apps_entity_restrictions_restful_menu() {
+  $items = array();
+
+  $items['admin/config/services/apps_entity_restrictions_restful'] = array(
+    'title' => 'Apps entity restrictions Restful',
+    'description' => 'Manage settings relate to Apps entity restrictions restful',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('apps_entity_restrictions_settings'),
+    'access arguments' => array('manage apps entity restrictions restful settings'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function apps_entity_restrictions_restful_permission() {
+  return array(
+    'manage apps entity restrictions restful settings' => array(
+      'title' => t('Manage Apps entity restrictions Restful settings'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_restful_parse_request_alter()
+ */
+function apps_entity_restrictions_restful_restful_parse_request_alter(&$request) {
+  $keys = array(
+    variable_get('apps_entity_restrictions_restful_public_public_key'),
+    variable_get('apps_entity_restrictions_restful_public_secret_key'),
+  );
+
+  foreach ($keys as $key) {
+    $value = \RestfulManager::getRequestHttpHeader($key);
+
+    if (!$value && !empty($_GET[$key])) {
+      // If no access token found on the HTTP header, check if it's in the URL
+      // itself. This allows to do a POST request to for example:
+      // https://example.com/api/file-upload?access_token=foo
+      $value = $_GET[$key];
+    }
+
+    $request['__application'] += array(
+      $key => $value,
+    );
+  }
+}
+
+/**
+ * Menu callback; Form settings.
+ */
+function apps_entity_restrictions_settings($form, &$form_state) {
+
+  $form['apps_entity_restrictions_restful_public_public_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Public key property'),
+    '#description' => t('Define which parameter in the header will hold the app public key.'),
+    '#default_value' => variable_get('apps_entity_restrictions_restful_public_public_key'),
+  );
+
+  $form['apps_entity_restrictions_restful_public_secret_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Secret key property'),
+    '#description' => t('Define which parameter in the header will hold the app secret key.'),
+    '#default_value' => variable_get('apps_entity_restrictions_restful_public_secret_key'),
+  );
+
+  return system_settings_form($form);
+}

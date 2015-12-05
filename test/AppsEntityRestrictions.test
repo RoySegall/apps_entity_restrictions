@@ -29,7 +29,7 @@ class AppsEntityRestrictionsBase extends DrupalWebTestCase {
     $this->app->need = array(
       'node' => array(
         'methods' => array('get'),
-        'property' => array('nid', 'body'),
+        'properties' => array('nid', 'body'),
       ),
     );
     $this->app->save();
@@ -49,7 +49,7 @@ class AppsEntityRestrictionsBase extends DrupalWebTestCase {
     $this->assertTrue($this->app->entityAccess('get', 'node'), 'The app have access to node entity.');
     $this->assertFalse($this->app->entityAccess('post', 'node'), 'The app does not have access to node entity.');
 
-    // Check property access.
+    // Check properties access.
     $this->assertTrue($this->app->entityPropertyAccess('get', 'node', 'nid'), 'The app have GET access to the node ID entity.');
     $this->assertTrue($this->app->entityPropertyAccess('get', 'node', 'body'), 'The app have GET access to the node body entity.');
     $this->assertFalse($this->app->entityPropertyAccess('get', 'node', 'field_date'), 'The app does not have GET access to the node date field.');

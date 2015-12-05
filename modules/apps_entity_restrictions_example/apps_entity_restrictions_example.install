@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * apps_entity_restrictions_example.install
+ */
+
+/**
+ * Implements hook_install().
+ */
+function apps_entity_restrictions_example_install() {
+  // Creating example application.
+  $app = apps_entity_restrictions_create();
+  $app->title = 'Demo application';
+  $app->need = array(
+    'node' => array(
+      'methods' => array('get'),
+      'properties' => array('nid', 'body'),
+    ),
+  );
+  $app->save();
+}

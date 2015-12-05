@@ -1,0 +1,8 @@
+name = Apps entity restrictions example
+description = Example module to show integration with apps entity restrictions.
+package = Apps entity restrictions
+core = 7.x
+
+dependencies[] = apps_entity_restrictions_restful
+
+files[] = includes/AppsEntityRestrictionsExampleArticle.php

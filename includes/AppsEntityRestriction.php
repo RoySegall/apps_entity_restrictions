@@ -152,6 +152,19 @@ class AppsEntityRestriction extends Entity {
   }
 
   /**
+   * Overrides Entity::save().
+   *
+   * Generate credentials when not provided.
+   */
+  public function save() {
+    if (empty($this->app_key) || empty($this->app_secret)) {
+      $this->generateKeyAndSecret();
+    }
+
+    return parent::save();
+  }
+
+  /**
    * Check if the app support a specific method.
    *
    * @param string $data
@@ -204,7 +217,8 @@ class AppsEntityRestriction extends Entity {
       return FALSE;
     }
 
-    return in_array($property, $this->need[$entity_type]['property']) ? TRUE : FALSE;
+    // Remove after changing the form to keep just the arrays of the methods.
+    return in_array($property, $this->need[$entity_type]['properties']) ? TRUE : FALSE;
   }
 
 }

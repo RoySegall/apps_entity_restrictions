@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * apps_entity_restrictions_example.module
+ */
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function apps_entity_restrictions_example_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'restful') {
+    return 'plugins/' . $plugin;
+  }
+}

@@ -1,5 +1,6 @@
 name = Apps entity restrictions
 description = Manage entity restrictions access for entities resources.
+package = Apps entity restrictions
 core = 7.x
 
 dependencies[] = entity
