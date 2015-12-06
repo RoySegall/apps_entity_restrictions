@@ -62,8 +62,8 @@ class AppsEntityRestrictionsRestfulBaseNode extends RestfulEntityBaseNode {
   /**
    * {@inheritdoc}
    */
-  public function access() {
-    $access = parent::access();
+  public function checkEntityAccess($op, $entity_type, $entity) {
+    $access =  parent::checkEntityAccess($op, $entity_type, $entity);
 
     if (!$this->app = AppsEntityRestrictionsRestful::loadByHeaders($this->request)) {
       return FALSE;
