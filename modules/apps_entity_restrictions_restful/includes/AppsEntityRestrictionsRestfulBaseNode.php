@@ -69,7 +69,12 @@ class AppsEntityRestrictionsRestfulBaseNode extends RestfulEntityBaseNode {
       return FALSE;
     }
 
-    return $access && $this->app->entityAccess(strtolower($this->getMethod()), $this->getEntityType());
+    $method = $this->getMethod();
+    if ($this->getMethod() == RestfulInterface::PATCH) {
+      $method = 'update';
+    }
+
+    return $access && $this->app->entityAccess($method, $this->getEntityType());
   }
 
 }

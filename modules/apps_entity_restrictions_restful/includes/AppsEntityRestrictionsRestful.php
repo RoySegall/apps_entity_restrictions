@@ -138,6 +138,7 @@ class AppsEntityRestrictionsRestful {
 
     $op_replacement = array(
       'view' => 'get',
+      'edit' => 'post',
     );
 
     $info = $property_wrapper->info();
