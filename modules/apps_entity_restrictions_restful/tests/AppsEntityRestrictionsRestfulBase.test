@@ -116,4 +116,85 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
     $this->assertTrue(!empty($result['tags']) && !empty($result['body']), 'The field body and the fields tags returned.');
   }
 
+  /**
+   * Testing other requests and their limitation other than GET.
+   */
+  public function testVariousRequests() {
+    // Creating a node.
+    $node = $this->drupalcreateNode(array('type' => 'article'));
+    $wrapper = entity_metadata_wrapper('node', $node);
+    $wrapper->body->set(array('value' => $this->randomString()));
+    $wrapper->save();
+
+    /** @var AppsEntityRestrictionsRestfulBaseNode $handler */
+    $handler = restful_get_restful_handler('aer_articles');
+    $handler->setApp($this->app);
+
+    // Disable any request.
+    $this->app
+      ->restrict('node', 'methods', 'get')
+      ->restrict('node', 'methods', 'post')
+      ->restrict('node', 'methods', 'patch')
+      ->restrict('node', 'methods', 'delete')
+      ->save();
+
+    // Test get.
+    try {
+      $handler->get($node->nid);
+      $this->fail('The app commit a GET request.');
+    } catch (\RestfulException $e) {
+      $this->pass('The app did not commit a GET request');
+    }
+
+    // Allow get.
+    $this->app->allow('node', 'methods', 'get')->save();
+    $handler->get($node->nid);
+    $this->pass('The app commit a GET request after allowing it.');
+
+    // Test POST.
+    try {
+      $handler->post('', array('body' => 'Test'));
+      $this->fail('The app commit a POST request.');
+    } catch (\RestfulException $e) {
+      $this->pass('The app did not commit a POST request');
+    }
+
+    // Allow post.
+    $this->app->allow('node', 'methods', 'post')->save();
+    $node = $handler->post('', array('body' => 'Test'));
+    $node = $node[0];
+
+    $this->assertEqual($node['body']['value'], 'Test', 'The post request has committed as expected.');
+
+    // Try PATCH.
+    // todo: fix when the access method will invoke not only in menu.
+    try {
+      $handler->patch($node['id'], array('body' => 'Test after update.'));
+      $this->fail('The app commit a PATCH request.');
+    } catch (\RestfulException $e) {
+      $this->pass('The app did not commit a PATCH request');
+    }
+
+    // Allow patch.
+    $this->app->allow('node', 'methods', 'patch')->save();
+    $update_node = $handler->patch($node['id'], array('body' => 'Test after update.'));
+    $update_node = $update_node[0];
+    $this->assertNotEqual($node['body']['value'], $update_node['body']['value'], 'The patch request has committed as expected.');
+
+    try {
+      $handler->delete($node['id']);
+      $this->fail('The app commit a DELETE request.');
+    } catch (\RestfulException $e) {
+      $this->pass('The app did not commit a DELETE request');
+    }
+
+    // Allow delete.
+    // todo: fix when the access method will invoke not only in menu.
+    $this->app->allow('node', 'methods', 'delete')->save();
+    $handler->delete($node['id']);
+
+    // Verify the node does not exists any more.
+    $this->assertTrue(empty($node), 'The app commit a DELETE request.');
+  }
+
 }

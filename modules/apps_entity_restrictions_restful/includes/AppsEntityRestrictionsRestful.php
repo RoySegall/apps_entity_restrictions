@@ -136,6 +136,10 @@ class AppsEntityRestrictionsRestful {
       return RestfulInterface::ACCESS_IGNORE;
     }
 
+    if (empty($app->need[$wrapper->type()]['methods'])) {
+      throw new RestfulBadRequestException('The app does not support any kind of request.');
+    }
+
     $op_replacement = array(
       'view' => 'get',
       'edit' => 'post',
