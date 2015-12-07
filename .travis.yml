@@ -43,6 +43,10 @@ before_script:
   - ls -al
   - drush --yes pm-enable apps_entity_restrictions apps_entity_restrictions_restful
 
+  # Patch Entity API.
+  - curl -O https://www.drupal.org/files/issues/2086225-entity-access-check-node-create-3.patch
+  - patch -p1 sites/all/modules/entity/modules/callbacks.inc  < 2086225-entity-access-check-node-create-3.patch
+
   # start a web server on port 8080, run in the background; wait for initialization
   - drush runserver 127.0.0.1:8080 > ~/php-server.log 2>&1 &
 
