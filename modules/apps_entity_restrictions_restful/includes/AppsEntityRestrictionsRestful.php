@@ -161,8 +161,13 @@ class AppsEntityRestrictionsRestful {
    * @throws RestfulBadRequestException
    */
   static public function checkEntityAccess(RestfulBase $controller) {
-    if (!$controller->app = AppsEntityRestrictionsRestful::loadByHeaders($controller->getRequest())) {
-      return FALSE;
+    if (!$controller->getApp()) {
+
+      if (!$app = AppsEntityRestrictionsRestful::loadByHeaders($controller->getRequest())) {
+        return FALSE;
+      }
+
+      $controller->setApp($app);
     }
 
     $method = $controller->getMethod();
