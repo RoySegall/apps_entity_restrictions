@@ -166,8 +166,7 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
 
     $this->assertEqual($node['body']['value'], 'Test', 'The post request has committed as expected.');
 
-    // Try PATCH.
-    // todo: fix when the access method will invoke not only in menu.
+    // Test PATCH.
     try {
       $handler->patch($node['id'], array('body' => 'Test after update.'));
       $this->fail('The app commit a PATCH request.');
@@ -176,7 +175,7 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
     }
 
     // Allow patch.
-    $this->app->allow('node', 'methods', 'patch')->save();
+    $this->app->allow('node', 'methods', 'update')->save();
     $update_node = $handler->patch($node['id'], array('body' => 'Test after update.'));
     $update_node = $update_node[0];
     $this->assertNotEqual($node['body']['value'], $update_node['body']['value'], 'The patch request has committed as expected.');
@@ -189,12 +188,11 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
     }
 
     // Allow delete.
-    // todo: fix when the access method will invoke not only in menu.
     $this->app->allow('node', 'methods', 'delete')->save();
     $handler->delete($node['id']);
 
     // Verify the node does not exists any more.
-    $this->assertTrue(empty($node), 'The app commit a DELETE request.');
+    $this->assertTrue(!node_load($node['id']), 'The app commit a DELETE request.');
   }
 
 }

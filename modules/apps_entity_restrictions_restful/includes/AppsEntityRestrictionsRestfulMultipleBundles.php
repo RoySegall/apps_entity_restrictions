@@ -62,14 +62,8 @@ class AppsEntityRestrictionsRestfulMultipleBundles extends RestfulEntityBaseMult
   /**
    * {@inheritdoc}
    */
-  public function access() {
-    $access = parent::access();
-
-    if (!$this->app = AppsEntityRestrictionsRestful::loadByHeaders()) {
-      throw new \RestfulBadRequestException('Application with the passed credential was not found. Please try again.');
-    }
-
-    return $access && $this->app->entityAccess(strtolower($this->getMethod()), $this->getEntityType());
+  public function checkEntityAccess($op, $entity_type, $entity) {
+    return parent::checkEntityAccess($op, $entity_type, $entity) && AppsEntityRestrictionsRestful::checkEntityAccess($this);
   }
 
 }

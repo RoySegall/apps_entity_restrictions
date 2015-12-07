@@ -15,6 +15,7 @@ files[] = includes/AppsEntityRestrictionsRestfulBase.php
 files[] = includes/AppsEntityRestrictionsRestfulBaseNode.php
 files[] = includes/AppsEntityRestrictionsRestfulBaseTaxonomyTerm.php
 files[] = includes/AppsEntityRestrictionsRestfulMultipleBundles.php
+files[] = includes/AppsEntityRestrictionsRestfulBaseUser.php
 
 ; Tests
 files[] = tests/AppsEntityRestrictionsRestfulBase.test
