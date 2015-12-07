@@ -175,7 +175,7 @@ class AppsEntityRestrictionsRestful {
       $method = 'update';
     }
 
-    return $controller->app->entityAccess(strtolower($method), $controller->getEntityType());
+    return $controller->getApp()->entityAccess(strtolower($method), $controller->getEntityType());
   }
 
 }
