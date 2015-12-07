@@ -1,0 +1,10 @@
+name = Apps entity restrictions reports
+description = Provide report ans statistic information for the application.
+package = Apps entity restrictions
+core = 7.x
+
+dependencies[] = apps_entity_restrictions
+dependencies[] = entity_view_count
+
+; Static methods.
+files[] = includes/AppsEntityRestrictionsReports.php
