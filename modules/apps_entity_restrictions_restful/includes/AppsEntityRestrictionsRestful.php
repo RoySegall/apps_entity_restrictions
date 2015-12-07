@@ -138,6 +138,7 @@ class AppsEntityRestrictionsRestful {
 
     $op_replacement = array(
       'view' => 'get',
+      'edit' => 'post',
     );
 
     $info = $property_wrapper->info();
@@ -147,6 +148,34 @@ class AppsEntityRestrictionsRestful {
     }
 
     return $app->entityPropertyAccess($op_replacement[$op], $wrapper->type(), $info['name']) ? RestfulInterface::ACCESS_ALLOW : RestfulInterface::ACCESS_DENY;
+  }
+
+  /**
+   * Helper static methods for all the base controllers.
+   *
+   * @param RestfulBase $controller
+   *   The controllers instance.
+   *
+   * @return bool
+   * @throws AppsEntityRestrictionsException
+   * @throws RestfulBadRequestException
+   */
+  static public function checkEntityAccess(RestfulBase $controller) {
+    if (!$controller->getApp()) {
+
+      if (!$app = AppsEntityRestrictionsRestful::loadByHeaders($controller->getRequest())) {
+        return FALSE;
+      }
+
+      $controller->setApp($app);
+    }
+
+    $method = $controller->getMethod();
+    if (in_array($controller->getMethod(), array(RestfulInterface::PATCH, RestfulInterface::PUT))) {
+      $method = 'update';
+    }
+
+    return $controller->getApp()->entityAccess(strtolower($method), $controller->getEntityType());
   }
 
 }
