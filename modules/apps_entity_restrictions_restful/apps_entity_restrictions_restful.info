@@ -2,6 +2,7 @@ name = Apps entity restrictions Restful
 description = Integration between restful and Apps entity restrictions
 package = Apps entity restrictions
 core = 7.x
+php = 5.4
 
 dependencies[] = apps_entity_restrictions
 dependencies[] = restful
@@ -11,11 +12,7 @@ files[] = includes/AppsEntityRestrictionsRestful.php
 
 ; Restful base class overrides.
 files[] = includes/AppsEntityRestrictionsRestful.php
-files[] = includes/AppsEntityRestrictionsRestfulBase.php
-files[] = includes/AppsEntityRestrictionsRestfulBaseNode.php
-files[] = includes/AppsEntityRestrictionsRestfulBaseTaxonomyTerm.php
-files[] = includes/AppsEntityRestrictionsRestfulMultipleBundles.php
-files[] = includes/AppsEntityRestrictionsRestfulBaseUser.php
+files[] = includes/AppsEntityRestrictionsRestfulTrait.php
 
 ; Tests
 files[] = tests/AppsEntityRestrictionsRestfulBase.test
