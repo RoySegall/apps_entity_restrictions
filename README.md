@@ -62,7 +62,7 @@ if (!$app->entityPropertyAccess('get', 'node', 'field_date')) {
 Your [restful](http://drupal.org/project/restful) endpoints could also benefit
 from the logic of Apps entity restrictions. You'd need to enable the module
 `Apps entity restrictions Restful`. The module come with the trait `AppsEntityRestrictionsRestfulTrait`
-and your endpoint need to use this trait is needed for two reasons:
+and your endpoints would need to use this trait for two reasons:
   * Add to the access method the entity access logic of Apps entity
     restrictions.
   * Add to each public field definition from `parent::publicFieldsInfo` a callback
