@@ -5,4 +5,36 @@
  * Main module file.
  */
 
+/**
+ * Implements hook_entity_info_alter().
+ */
+function apps_entity_restrictions_reports_entity_info_alter(&$entity_info) {
+  $entity_info['entity_view_count']['bundle admin ui'] = array(
+    'path' => 'admin/structure/entity_view_count',
+    'permission' => 'manage entity view count fields',
+  );
+}
 
+/**
+ * Implements hook_permission().
+ */
+function apps_entity_restrictions_reports_permission() {
+  return array(
+    'manage entity view count fields' => array(
+      'title' => t('Manage entity view count fields'),
+      'description' => t('Grant this permission to users which can manage entity view count fields.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_bundle_ENTITY_TYPE_bundle_info().
+ */
+function apps_entity_restrictions_reports_entity_bundle_entity_view_count_bundle_info() {
+  return array(
+    'apps_usage' => array(
+      'label' => t('Apps usage'),
+      'description' => t('Track usages for apps requests.'),
+    ),
+  );
+}

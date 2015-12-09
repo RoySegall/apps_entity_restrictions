@@ -4,6 +4,7 @@ package = Apps entity restrictions
 core = 7.x
 
 dependencies[] = apps_entity_restrictions
+dependencies[] = entity_bundle_admin
 dependencies[] = entity_view_count
 
 ; Static methods.
