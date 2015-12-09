@@ -11,11 +11,7 @@ files[] = includes/AppsEntityRestrictionsRestful.php
 
 ; Restful base class overrides.
 files[] = includes/AppsEntityRestrictionsRestful.php
-files[] = includes/AppsEntityRestrictionsRestfulBase.php
-files[] = includes/AppsEntityRestrictionsRestfulBaseNode.php
-files[] = includes/AppsEntityRestrictionsRestfulBaseTaxonomyTerm.php
-files[] = includes/AppsEntityRestrictionsRestfulMultipleBundles.php
-files[] = includes/AppsEntityRestrictionsRestfulBaseUser.php
+files[] = includes/AppsEntityRestrictionsRestfulTrait.php
 
 ; Tests
 files[] = tests/AppsEntityRestrictionsRestfulBase.test

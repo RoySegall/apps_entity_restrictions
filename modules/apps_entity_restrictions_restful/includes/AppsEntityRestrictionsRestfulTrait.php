@@ -2,13 +2,9 @@
 
 /**
  * @file
- * Contains AppsEntityRestrictionsRestfulBaseUser.
+ * Contain AppsEntityRestrictionsRestfulTrait
  */
-
-/**
- * @see AppsEntityRestrictionsRestful::publicFieldsInfo().
- */
-class AppsEntityRestrictionsRestfulBaseUser extends RestfulEntityBaseUser {
+trait AppsEntityRestrictionsRestfulTrait {
 
   /**
    * @var AppsEntityRestriction
@@ -31,7 +27,7 @@ class AppsEntityRestrictionsRestfulBaseUser extends RestfulEntityBaseUser {
    * @param AppsEntityRestriction $app
    *   The application instance.
    *
-   * @return AppsEntityRestrictionsRestfulBaseUser
+   * @return AppsEntityRestrictionsRestfulTrait
    */
   public function setApp($app) {
     $this->app = $app;
@@ -42,7 +38,7 @@ class AppsEntityRestrictionsRestfulBaseUser extends RestfulEntityBaseUser {
   /**
    * Clearing the app static cache.
    *
-   * @return AppsEntityRestrictionsRestfulBaseUser
+   * @return AppsEntityRestrictionsRestfulTrait
    */
   public function cleanApp() {
     $this->app = NULL;
