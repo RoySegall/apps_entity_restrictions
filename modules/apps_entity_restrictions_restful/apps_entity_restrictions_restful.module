@@ -5,6 +5,8 @@
  * apps_entity_restrictions_restful.module
  */
 
+require_once 'includes/AppsEntityRestrictionsRestfulTrait.php';
+
 /**
  * Implements hook_menu().
  */
