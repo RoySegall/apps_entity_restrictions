@@ -38,3 +38,10 @@ function apps_entity_restrictions_reports_entity_bundle_entity_view_count_bundle
     ),
   );
 }
+
+/**
+ * Implements hook_apps_entity_restriction_app_event_listener().
+ */
+function apps_entity_restrictions_reports_apps_entity_restriction_app_event_listener(AppsEntityRestriction $app, $info) {
+  dpm('a');
+}

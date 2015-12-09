@@ -108,7 +108,7 @@ function hook_apps_entity_restrictions_entity_ignore_alter(&$implements) {
  * @param $info
  *   Info provided by the event.
  */
-function apps_entity_restriction_app_event_listener(AppsEntityRestriction $app, $info) {
+function hook_apps_entity_restriction_app_event_listener(AppsEntityRestriction $app, $info) {
   if ($info['reason'] != 'bad_credentials') {
     return;
   }
