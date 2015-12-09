@@ -1,4 +1,3 @@
-# Apps entity restrictions
 [![Build Status](https://api.travis-ci.org/RoySegall/apps_entity_restrictions.svg?branch=7.x-1.x)](https://travis-ci.org/RoySegall/apps_entity_restrictions)
 ## General info
 When your Drupal site need to act as a backend you would like to restrict third
