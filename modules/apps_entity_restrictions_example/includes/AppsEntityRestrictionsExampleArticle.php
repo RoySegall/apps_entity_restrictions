@@ -5,7 +5,9 @@
  * Contains AppsEntityRestrictionsExampleArticle.
  */
 
-class AppsEntityRestrictionsExampleArticle extends AppsEntityRestrictionsRestfulBaseNode {
+class AppsEntityRestrictionsExampleArticle extends RestfulEntityBaseNode {
+
+  use AppsEntityRestrictionsRestfulTrait;
 
   /**
    * {@inheritdoc}
