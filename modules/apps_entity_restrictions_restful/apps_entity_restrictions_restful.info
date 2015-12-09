@@ -2,6 +2,7 @@ name = Apps entity restrictions Restful
 description = Integration between restful and Apps entity restrictions
 package = Apps entity restrictions
 core = 7.x
+php = 5.4
 
 dependencies[] = apps_entity_restrictions
 dependencies[] = restful
