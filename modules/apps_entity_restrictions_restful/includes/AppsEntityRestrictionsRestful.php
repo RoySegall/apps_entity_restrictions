@@ -147,7 +147,20 @@ class AppsEntityRestrictionsRestful {
       return RestfulInterface::ACCESS_IGNORE;
     }
 
-    return $app->entityPropertyAccess($op_replacement[$op], $wrapper->type(), $info['name']) ? RestfulInterface::ACCESS_ALLOW : RestfulInterface::ACCESS_DENY;
+    if (!$app->entityPropertyAccess($op_replacement[$op], $wrapper->type(), $info['name'])) {
+      // Track a bad
+      $app->dispatch(array(
+        'reason' => 'property_operation_not_allowed',
+        'method' => $op,
+        'entity_type' => $wrapper->type(),
+      ));
+
+      return RestfulInterface::ACCESS_DENY;
+    }
+
+    // A good request against a property should happen more often. There for
+    // this won't be recorded since the records number got be very very high.
+    return RestfulInterface::ACCESS_ALLOW;
   }
 
   /**
@@ -170,12 +183,32 @@ class AppsEntityRestrictionsRestful {
       $controller->setApp($app);
     }
 
+    /** @var AppsEntityRestriction $app */
+    $app = $controller->getApp();
+
     $method = $controller->getMethod();
     if (in_array($controller->getMethod(), array(RestfulInterface::PATCH, RestfulInterface::PUT))) {
       $method = 'update';
     }
 
-    return $controller->getApp()->entityAccess(strtolower($method), $controller->getEntityType());
+    if (!$app->entityAccess(strtolower($method), $controller->getEntityType())) {
+      // Return false and notify listeners for a bad request.
+      $app->dispatch(array(
+        'reason' => 'general_operation_not_allowed',
+        'method' => $method,
+        'entity_type' => $controller->getEntityType(),
+      ));
+      return FALSE;
+    }
+
+    // Notify listeners for a good request.
+    $app->dispatch(array(
+      'reason' => 'general_operation_allowed',
+      'method' => $method,
+      'entity_type' => $controller->getEntityType(),
+    ));
+
+    return TRUE;
   }
 
 }

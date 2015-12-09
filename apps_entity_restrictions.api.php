@@ -95,3 +95,33 @@ function hook_apps_entity_restrictions_entity_ignore() {
 function hook_apps_entity_restrictions_entity_ignore_alter(&$implements) {
   unset($implements['foo']);
 }
+
+/**
+ * Listening to event triggered by an app instance.
+ *
+ * The hook can be used when event relate to any application occurred i.e bad
+ * parameters were passed to a request or notify when app tried to pass it's
+ * restrictions.
+ *
+ * @param AppsEntityRestriction $app
+ *   The application instance.
+ * @param $info
+ *   Info provided by the event.
+ */
+function apps_entity_restriction_app_event_listener(AppsEntityRestriction $app, $info) {
+  if ($info['reason'] != 'bad_credentials') {
+    return;
+  }
+
+  // The code below is an example for sending a push notification for the app
+  // owner. The push will notify his app passed bad credentials.
+
+  // Some module can create a message with a template relate to the failure.
+  $message = message_create('app_bad_credentials');
+  $message->uid = $app->getUid();
+  $message->field_application_reference->set($app);
+  $message->field_bad_request_info->set($info['data']);
+
+  // Sending the message via push notification services.
+  message_notify_send_message($message, array(), 'push_notification');
+}
