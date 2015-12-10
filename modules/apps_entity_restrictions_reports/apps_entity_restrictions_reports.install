@@ -35,7 +35,25 @@ function apps_entity_restrictions_reports_install() {
     'type' => 'list_text',
   ));
 
-  // Creating the instance.
+  field_create_field(array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_info',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'text_long',
+  ));
+
+  // Create instance.
   field_create_instance(array(
     'bundle' => 'apps_usage',
     'default_value' => NULL,
@@ -54,6 +72,26 @@ function apps_entity_restrictions_reports_install() {
       'settings' => array(),
       'type' => 'options_select',
       'weight' => 1,
+    ),
+  ));
+
+  field_create_instance(array(
+    'bundle' => 'apps_usage',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'entity_type' => 'entity_view_count',
+    'field_name' => 'field_info',
+    'label' => 'info',
+    'required' => 0,
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 1,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 2,
     ),
   ));
 }

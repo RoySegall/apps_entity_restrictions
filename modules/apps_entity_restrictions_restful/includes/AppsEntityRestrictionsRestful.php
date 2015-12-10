@@ -148,12 +148,18 @@ class AppsEntityRestrictionsRestful {
     }
 
     if (!$app->entityPropertyAccess($op_replacement[$op], $wrapper->type(), $info['name'])) {
-      // Track a bad
-      $app->dispatch(array(
-        'reason' => 'property_operation_not_allowed',
-        'method' => $op,
-        'entity_type' => $wrapper->type(),
-      ));
+
+      if ($op_replacement[$op] != strtolower(RestfulInterface::GET)) {
+        // We would like to notify bad properties access except for GET since
+        // those request would occur deliberately.
+        $app->dispatch(array(
+          'reason' => 'property_operation_not_allowed',
+          'method' => $op,
+          'property' => $public_field_name,
+          'entity_type' => $wrapper->type(),
+          'entity_id' => $wrapper->getIdentifier(),
+        ));
+      }
 
       return RestfulInterface::ACCESS_DENY;
     }
@@ -166,14 +172,14 @@ class AppsEntityRestrictionsRestful {
   /**
    * Helper static methods for all the base controllers.
    *
-   * @param RestfulBase $controller
+   * @param RestfulEntityBase $controller
    *   The controllers instance.
    *
    * @return bool
    * @throws AppsEntityRestrictionsException
    * @throws RestfulBadRequestException
    */
-  static public function checkEntityAccess(RestfulBase $controller) {
+  static public function checkEntityAccess(RestfulEntityBase $controller) {
     if (!$controller->getApp()) {
 
       if (!$app = AppsEntityRestrictionsRestful::loadByHeaders($controller->getRequest())) {
@@ -197,6 +203,7 @@ class AppsEntityRestrictionsRestful {
         'reason' => 'general_operation_not_allowed',
         'method' => $method,
         'entity_type' => $controller->getEntityType(),
+        'entity_id' => $controller->getPath(),
       ));
       return FALSE;
     }
@@ -206,6 +213,7 @@ class AppsEntityRestrictionsRestful {
       'reason' => 'general_operation_allowed',
       'method' => $method,
       'entity_type' => $controller->getEntityType(),
+      'entity_id' => $controller->getPath(),
     ));
 
     return TRUE;

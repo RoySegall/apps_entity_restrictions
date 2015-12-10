@@ -40,16 +40,59 @@ function apps_entity_restrictions_reports_entity_bundle_entity_view_count_bundle
 }
 
 /**
+ * Implements hook_views_api().
+ */
+function apps_entity_restrictions_reports_views_api() {
+  return array(
+    'api' => 3,
+  );
+}
+
+/**
  * Implements hook_apps_entity_restriction_app_event_listener().
  */
 function apps_entity_restrictions_reports_apps_entity_restriction_app_event_listener(AppsEntityRestriction $app, $info) {
+  $parameters = array(
+    '@method' => $info['method'],
+    '@entity_type' => $info['entity_type'],
+    '@entity_id' => $info['entity_id'],
+  );
+
   $evc = entity_view_count_create(array());
   $evc->entity_id = $app->getId();
   $evc->entity_type = 'apps_entity_restrictions';
   $evc->type = 'apps_usage';
 
   $wrapper = entity_metadata_wrapper('entity_view_count', $evc);
-  $request_status = in_array($info['reason'], array('property_operation_not_allowed', 'general_operation_not_allowed')) ? 'failed' : 'passed';
-  $wrapper->field_request_status->set($request_status);
+
+  if (in_array($info['reason'], array('property_operation_not_allowed', 'general_operation_not_allowed'))) {
+    $status = 'Failed';
+
+    if ($info['reason'] == 'property_operation_not_allowed') {
+      $parameters['@property'] = $info['property'];
+      if (empty($info['entity_id'])) {
+        $log_message = format_string("The app made a bad @method request against @property for @entity_type.", $parameters);
+      }
+      else {
+        $log_message = format_string("The app made a bad @method request against @property for @entity_type:@entity_id.", $parameters);
+      }
+    }
+    else {
+      if (empty($info['entity_id'])) {
+        $log_message = format_string("The app made a bad @method request against a @entity_type endpoint.", $parameters);
+      }
+      else {
+        $log_message = format_string("The app made a bad @method request against @entity_type:@entity_id.", $parameters);
+      }
+    }
+  }
+  else {
+    $status = 'Passed';
+    $log_message = format_string("The app made a good @method request against @entity_type:@entity_id", $parameters);
+  }
+
+  $wrapper->field_request_status->set($status);
+  $wrapper->field_info->set($log_message);
+
   $wrapper->save();
 }
