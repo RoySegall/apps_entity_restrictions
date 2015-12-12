@@ -11,11 +11,11 @@
  */
 function apps_entity_restrictions_reports_views_default_views() {
   $view = new view();
-  $view->name = 'apps_log_requests';
+  $view->name = 'Apps log requests';
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'entity_view_count';
-  $view->human_name = 'foo';
+  $view->human_name = 'apps_log_requests';
   $view->core = 7;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
