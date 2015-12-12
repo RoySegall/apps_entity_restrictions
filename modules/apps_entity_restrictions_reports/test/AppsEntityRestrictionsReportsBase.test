@@ -1,0 +1,86 @@
+<?php
+
+/**
+ * @file
+ * Contains \AppsEntityRestrictionsRestfulBaseTest.
+ */
+
+class AppsEntityRestrictionsReportsBase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Apps entity restrictions reports basic',
+      'description' => 'Test apps entity restrictions reports basic logic.',
+      'group' => 'Apps entity restrictions',
+    );
+  }
+
+  /**
+   * @var AppsEntityRestriction
+   */
+  protected $app;
+
+  /**
+   * @var StdClass
+   *
+   * The term object.
+   */
+  protected $term;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp(array('apps_entity_restrictions_example', 'apps_entity_restrictions_reports'));
+
+    // Create application.
+    $this->app = apps_entity_restrictions_create();
+    $this->app
+      ->setTitle('Demo application')
+      ->allow('node', 'methods', 'get')
+      ->allow('node', 'properties', 'nid')
+      ->allow('node', 'properties', 'body')
+      ->save();
+
+    // Create the field tags field.
+    $vocabulary = (object) array(
+      'name' => $this->randomName(),
+      'description' => $this->randomName(),
+      'machine_name' => strtolower($this->randomName()),
+    );
+    taxonomy_vocabulary_save($vocabulary);
+
+    if (!field_info_field('field_tags')) {
+      $field = array(
+        'field_name' => 'field_tags',
+        'type' => 'taxonomy_term_reference',
+        'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      );
+      field_create_field($field);
+    }
+
+    if (!field_info_instance('node', 'field_tags', 'article')) {
+      $instance = array(
+        'field_name' => 'field_tags',
+        'entity_type' => 'node',
+        'bundle' => 'article',
+      );
+      field_create_instance($instance);
+    }
+
+    // Crete a term in the vocabulary.
+    $this->term = new stdClass();
+    $this->term->name = $this->randomName();
+    $this->term->vid = $vocabulary->vid;
+    taxonomy_term_save($this->term);
+  }
+
+  /**
+   * Verify AppsEntityRestrictionsRestful::accessCallbacks() applies the
+   * restriction logic.
+   */
+  public function testBasicReports() {
+    debug('a');
+  }
+
+}

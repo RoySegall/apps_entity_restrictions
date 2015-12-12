@@ -10,3 +10,6 @@ dependencies[] = views
 
 ; Static methods.
 files[] = includes/AppsEntityRestrictionsReports.php
+
+; Tests
+file[] = includes/AppsEntityRestrictionsReportsBase.test
