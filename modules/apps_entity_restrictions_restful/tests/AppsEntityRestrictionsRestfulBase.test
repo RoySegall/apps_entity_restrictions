@@ -126,7 +126,7 @@ class AppsEntityRestrictionsRestfulBaseTest extends DrupalWebTestCase {
     $wrapper->body->set(array('value' => $this->randomString()));
     $wrapper->save();
 
-    /** @var AppsEntityRestrictionsRestfulBaseNode $handler */
+    /** @var RestfulEntityBase $handler */
     $handler = restful_get_restful_handler('aer_articles');
     $handler->setApp($this->app);
 
