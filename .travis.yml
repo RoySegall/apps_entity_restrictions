@@ -42,7 +42,9 @@ before_script:
 
   # Gettin the moudles.
   - drush dl restful-7.x-1.6
+  - cs sites/all/modules
   - git clone https://github.com/DrupalHub/entity_view_count.git
+  - cd -
 
   # Enaabling the modules.
   - drush --yes pm-enable apps_entity_restrictions apps_entity_restrictions_restful apps_entity_restrictions_reports

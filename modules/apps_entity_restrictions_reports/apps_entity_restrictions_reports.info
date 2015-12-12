@@ -7,6 +7,8 @@ dependencies[] = apps_entity_restrictions
 dependencies[] = entity_bundle_admin
 dependencies[] = entity_view_count
 dependencies[] = views
+dependencies[] = list
+dependencies[] = text
 
 ; Static methods.
 files[] = includes/AppsEntityRestrictionsReports.php
