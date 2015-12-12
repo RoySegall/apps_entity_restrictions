@@ -75,7 +75,7 @@ function apps_entity_restrictions_reports_apps_entity_restriction_app_event_list
       'object' => 'The app made a bad @method request against @entity_type:@entity_id.',
     ),
     'general_operation_allowed' => array(
-      'general' => 'The app made a good @method request against @entity_type.',
+      'general' => 'The app made a good @method request against a @entity_type.',
       'object' => 'The app made a good @method request against @entity_type:@entity_id.',
     ),
   );
@@ -89,6 +89,5 @@ function apps_entity_restrictions_reports_apps_entity_restriction_app_event_list
 
   $wrapper->field_request_status->set($status);
   $wrapper->field_info->set(format_string($log_message, $parameters));
-
   $wrapper->save();
 }

@@ -1,0 +1,136 @@
+<?php
+
+/**
+ * @file
+ * Contains \AppsEntityRestrictionsRestfulBaseTest.
+ */
+
+class AppsEntityRestrictionsReportsBase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Apps entity restrictions reports basic',
+      'description' => 'Test apps entity restrictions reports basic logic.',
+      'group' => 'Apps entity restrictions',
+    );
+  }
+
+  /**
+   * @var AppsEntityRestriction
+   */
+  protected $app;
+
+  /**
+   * @var StdClass
+   *
+   * The term object.
+   */
+  protected $term;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp(array('apps_entity_restrictions_example', 'apps_entity_restrictions_reports'));
+
+    // Create application.
+    $this->app = apps_entity_restrictions_create();
+    $this->app
+      ->setTitle('Demo application')
+      ->allow('node', 'methods', 'get')
+      ->allow('node', 'properties', 'nid')
+      ->save();
+  }
+
+  /**
+   * Testing the logging of the entity view count for requests.
+   */
+  public function testBasicReports() {
+    // Creating a node.
+    $node = $this->drupalcreateNode(array('type' => 'article'));
+    $wrapper = entity_metadata_wrapper('node', $node);
+    $wrapper->save();
+
+    /** @var RestfulEntityBase $handler */
+    $handler = restful_get_restful_handler('aer_articles');
+    $handler->setApp($this->app);
+
+    // Log what we expected.
+    $expected = array();
+
+    // Logging a good general request - accessing a general endpoint.
+    $handler->get();
+    $expected[] = 'The app made a good GET request against a node.';
+
+    // Logging a good specific request - accessing a specific entity.
+    $handler->get($node->nid);
+
+    // Restrict GET access for node.
+    $this->app->restrict('node', 'methods', 'get')->save();
+    $expected[] = "The app made a good GET request against node:{$node->nid}.";
+
+    // Logging a bad general request - try to access a general end point.
+    $handler->get();
+    $expected[] = 'The app made a bad GET request against a node endpoint.';
+
+    // Logging a bad specific request - try to access a specific endpoint.
+    try {
+      $handler->get($node->nid);
+    } catch (\RestfulForbiddenException $e) {
+      $expected[] = "The app made a bad GET request against node:{$node->nid}.";
+    }
+
+    // Logging a bad general property request - trying to create an entity with
+    // restricted field.
+    try {
+      $handler->post('', array('label' => 'foo'));
+    }
+    catch (\RestfulForbiddenException $e) {
+      $expected[] = 'The app made a bad POST request against a node endpoint.';
+    }
+
+    // Logging a bad specific property requests:
+    //  1. trying to create with a restricted property.
+    //  2. trying to update a restricted property.
+    $this->app
+      ->allow('node', 'methods', 'post')
+      ->allow('node', 'methods', 'update')
+      ->save();
+
+    // We still allow good post request. Add this to the logs.
+    $expected[] = 'The app made a good POST request against a node.';
+
+    try {
+      $handler->post('', array('label' => 'foo'));
+    }
+    catch (\RestfulBadRequestException $e) {
+      $expected[] = 'The app made a bad edit request against label for node.';
+    }
+
+    try {
+      $handler->update($node->nid, array('label' => 'foo'));
+    }
+    catch (\RestfulBadRequestException $e) {
+      $expected[] = "The app made a bad edit request against label for node:{$node->nid}.";
+    }
+
+    // Load all the entity view count.
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'entity_view_count')
+      ->propertyCondition('entity_type', 'apps_entity_restrictions')
+      ->propertyCondition('entity_id', $this->app->identifier())
+      ->execute();
+
+    $evcs = entity_view_count_load_multiple(array_keys($result['entity_view_count']));
+
+    $logs = array();
+    foreach ($evcs as $evc) {
+      $wrapper = entity_metadata_wrapper('entity_view_count', $evc);
+      $logs[] = $wrapper->field_info->value();
+    }
+
+    $this->assertFalse(array_diff($logs, $expected), 'The requests were logged as expected.');
+  }
+
+}

@@ -12,4 +12,4 @@ dependencies[] = views
 files[] = includes/AppsEntityRestrictionsReports.php
 
 ; Tests
-file[] = includes/AppsEntityRestrictionsReportsBase.test
+files[] = tests/AppsEntityRestrictionsReportsBase.test
