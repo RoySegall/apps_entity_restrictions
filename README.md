@@ -96,3 +96,13 @@ class AppsEntityRestrictionsExampleArticle extends RestfulEntityBaseNode {
 
 }
 ```
+
+## Reports section
+
+Download [Line chart](https://github.com/n3-charts/line-chart) into the 
+libraries folder(usually `site/all/libraries` or `profile/{PROFILE}/libraries`)
+under the folder `line-chart` and make sure the build folder have the file 
+`line-chart.min.js`. If not, you probably downloaded the dev version. Download
+the stable release.
+
+
