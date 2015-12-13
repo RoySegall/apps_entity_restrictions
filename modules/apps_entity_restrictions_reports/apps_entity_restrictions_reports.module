@@ -16,6 +16,34 @@ function apps_entity_restrictions_reports_entity_info_alter(&$entity_info) {
 }
 
 /**
+ * Implements hook_menu().
+ */
+function apps_entity_restrictions_reports_menu() {
+  $items = array();
+
+  $items['admin/apps/%apps_entity_restrictions/reports'] = array(
+    'title' => 'Reports',
+    'description' => 'View reports of the user.',
+    'access callback' => 'apps_entity_restrictions_reports_access',
+    'access arguments' => array(2),
+    'page callback' => 'apps_entity_restrictions_reports_report_page',
+    'page arguments' => array(2),
+    'file' => 'apps_entity_restrictions_reports.pages.inc',
+    'file path' => drupal_get_path('module', 'apps_entity_restrictions_reports') . '/pages/',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Access callback; Check if the user have access to the view reports.
+ */
+function apps_entity_restrictions_reports_access(AppsEntityRestriction $app) {
+  return AppsEntityRestrictionsReports::reportsAccess($app);
+}
+
+/**
  * Implements hook_permission().
  */
 function apps_entity_restrictions_reports_permission() {
@@ -23,6 +51,14 @@ function apps_entity_restrictions_reports_permission() {
     'manage entity view count fields' => array(
       'title' => t('Manage entity view count fields'),
       'description' => t('Grant this permission to users which can manage entity view count fields.'),
+    ),
+    'view owned application reports' => array(
+      'title' => t('View owned application reports'),
+      'description' => t('Grant to the user permission to view reports relate to application he own.'),
+    ),
+    'view any application reports' => array(
+      'title' => t('View any application reports'),
+      'description' => t('Grant to the user permission to view reports relate to any application.'),
     ),
   );
 }
@@ -90,4 +126,25 @@ function apps_entity_restrictions_reports_apps_entity_restriction_app_event_list
   $wrapper->field_request_status->set($status);
   $wrapper->field_info->set(format_string($log_message, $parameters));
   $wrapper->save();
+}
+
+/**
+ * Implements hook_apps_entity_restrictions_app_options_alter().
+ */
+function apps_entity_restrictions_reports_apps_entity_restrictions_app_options_alter(&$items, AppsEntityRestriction $app) {
+  if (!AppsEntityRestrictionsReports::reportsAccess($app)) {
+    return;
+  }
+
+  $items[] = $app->generateLink('apps_reports');
+}
+
+/**
+ * Implements hook_apps_entity_restrictions_generate_links_action_alter().
+ */
+function apps_entity_restrictions_reports_apps_entity_restrictions_generate_links_action_alter(&$actions, AppsEntityRestriction $app) {
+  $actions['apps_reports'] = array(
+    'title' => t('Reports'),
+    'href' => 'admin/apps/' . $app->id . '/reports',
+  );
 }
