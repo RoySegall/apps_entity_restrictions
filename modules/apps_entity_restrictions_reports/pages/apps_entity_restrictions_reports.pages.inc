@@ -16,5 +16,5 @@
  *   The content of the body.
  */
 function apps_entity_restrictions_reports_report_page(AppsEntityRestriction $app) {
-  return 'a';
+  return views_embed_view('apps_entity_request', 'application_logs', $app->identifier());
 }

@@ -4,11 +4,13 @@ package = Apps entity restrictions
 core = 7.x
 
 dependencies[] = apps_entity_restrictions
+dependencies[] = ctools
 dependencies[] = entity_bundle_admin
 dependencies[] = entity_view_count
-dependencies[] = views
 dependencies[] = list
 dependencies[] = text
+dependencies[] = views
+dependencies[] = views_content
 
 ; Static methods.
 files[] = includes/AppsEntityRestrictionsReports.php
