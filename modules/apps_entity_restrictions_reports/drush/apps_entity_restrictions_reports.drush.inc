@@ -44,8 +44,6 @@ function drush_apps_entity_restrictions_reports_generate_dummy_hits($id) {
     ->setTime(0,0)
     ->getTimestamp();
 
-  $first_day_time = $current - 86400;
-
   // Iterate form the first timestamp and jump by 24 hours every time. This will
   // ensure we will generate hits for each day at the time period we got.
   for ($midnight_of_the_day = $first_day_time; $midnight_of_the_day < $current; $midnight_of_the_day = $midnight_of_the_day + 86400) {
