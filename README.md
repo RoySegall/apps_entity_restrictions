@@ -99,7 +99,6 @@ class AppsEntityRestrictionsExampleArticle extends RestfulEntityBaseNode {
 
 ## Reports section
 
-Download [Chart.js](http://www.chartjs.org/) into the libraries folder(usually
-`site/all/libraries` or `profile/{PROFILE}/libraries`) under the folder
-`Chart.js` and make sure the file `Chart.min.js` is placed in the root position
-of that folder.
+Download [chartist js](https://gionkunz.github.io/chartist-js/) into the 
+libraries folder. Make sure the files `chartist.min.js` and `chartist.min.css`
+located at the root of the folder.

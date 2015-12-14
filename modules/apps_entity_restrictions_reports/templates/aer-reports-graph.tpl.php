@@ -1,3 +1,3 @@
 <div style="text-align: center;">
-  <canvas id="chart" style="width: 50%;"></canvas>
+  <div class="ct-chart ct-perfect-fourth"></div>
 </div>

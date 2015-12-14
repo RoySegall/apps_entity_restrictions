@@ -155,13 +155,18 @@ function apps_entity_restrictions_reports_apps_entity_restrictions_generate_link
 function apps_entity_restrictions_reports_library() {
   $libraries = array();
 
-  $libraries['line-chart'] = array(
-    'title' => t('Line chart'),
-    'website' => 'http://n3-charts.github.io/line-chart/',
+  $base_path = libraries_get_path('chartist-js');
+
+  $libraries['chartist-js'] = array(
+    'title' => t('Chartlist JS'),
+    'website' => 'https://github.com/gionkunz/chartist-js',
     'version' => '1.0',
     'js' => array(
-      libraries_get_path('Chart.js') . '/Chart.min.js' => array(),
+      $base_path . '/chartist.min.js' => array(),
       drupal_get_path('module', 'apps_entity_restrictions_reports') . '/js/AppsEntityRestrictionsReports.js' => array(),
+    ),
+    'css' => array(
+      $base_path . '/chartist.min.css' => array(),
     ),
   );
 
