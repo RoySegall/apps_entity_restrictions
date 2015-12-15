@@ -99,4 +99,43 @@ class AppsEntityRestrictionsReports {
     return $evcs;
   }
 
+  /**
+   * Calculate the hits for each day.
+   *
+   * @param $months_and_days
+   *   The days and months which we need to build upon the hits.
+   *
+   * @return array
+   *   The total, good and bad hits info.
+   */
+  public static function calculateHits(array $months_and_days) {
+    return array(
+      [6, 9, 1,2,2,10,6,3,4,5,6,7,7,8,4,2,4],
+      [15, 1, 1,12,3,4,5,6,17,7,8,14,2,4,12,1,6],
+      [5, 9, 1,2,3,4,5,6,7,7,8,4,2,4,2,10,6]
+    );
+  }
+
+  /**
+   * Hold list of logs messages.
+   *
+   * @return array
+   */
+  public static function logsList() {
+    return array(
+      'property_operation_not_allowed' => array(
+        'general' => 'The app made a bad @method request against @property for @entity_type.',
+        'object' => 'The app made a bad @method request against @property for @entity_type:@entity_id.',
+      ),
+      'general_operation_not_allowed' => array(
+        'general' => 'The app made a bad @method request against a @entity_type endpoint.',
+        'object' => 'The app made a bad @method request against @entity_type:@entity_id.',
+      ),
+      'general_operation_allowed' => array(
+        'general' => 'The app made a good @method request against a @entity_type.',
+        'object' => 'The app made a good @method request against @entity_type:@entity_id.',
+      ),
+    );
+  }
+
 }

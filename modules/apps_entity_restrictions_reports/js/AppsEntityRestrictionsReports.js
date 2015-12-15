@@ -21,17 +21,14 @@
       var charts = settings.chart;
       var months = charts.months;
       var days = charts.days;
+      var hits = charts.hits;
 
       // keep the current month. Will be used for pagination.
       var month_position = 0;
 
       var data = {
         labels: days[months[month_position]],
-        series: [
-          [6, 9, 1,2,2,10,6,3,4,5,6,7,7,8,4,2,4],
-          [15, 1, 1,12,3,4,5,6,17,7,8,14,2,4,12,01,6],
-          [5, 9, 1,2,3,4,5,6,7,7,8,4,2,4,2,10,6]
-        ]
+        series: hits
       };
 
       new Chartist.Line('.ct-chart', data, options);
