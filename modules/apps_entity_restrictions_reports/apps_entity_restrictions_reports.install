@@ -113,7 +113,7 @@ function apps_entity_restrictions_reports_install() {
     ),
   ));
 
-  field_create_instance( array(
+  field_create_instance(array(
     'bundle' => 'apps_usage',
     'default_value' => NULL,
     'entity_type' => 'entity_view_count',

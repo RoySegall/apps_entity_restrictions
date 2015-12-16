@@ -41,14 +41,14 @@ class AppsEntityRestrictionsReports {
   public static function getViewsDays(AppsEntityRestriction $app) {
 
     if (!$evcs = self::getAppViews($app)) {
-      return;
+      return array();
     }
 
     $months = array();
 
     foreach ($evcs as $evc) {
-      $day = format_date($evc->created, 'custom', 'd');
-      $month = format_date($evc->created, 'custom', 'm');
+      $day = date('d', $evc->created);
+      $month = date('m/y', $evc->created);
 
       if (empty($months[$month])) {
         $months[$month] = array();
@@ -86,7 +86,7 @@ class AppsEntityRestrictionsReports {
           ->fields('evc', array('created'))
           ->orderBy('created')
           ->execute()
-        ->fetchAllAssoc('created');
+          ->fetchAllAssoc('created');
 
         if (!$result) {
           return;

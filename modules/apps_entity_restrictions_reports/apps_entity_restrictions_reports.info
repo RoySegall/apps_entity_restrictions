@@ -3,12 +3,12 @@ description = Provide report ans statistic information for the application.
 package = Apps entity restrictions
 core = 7.x
 
-dependencies[] = angularjs
 dependencies[] = apps_entity_restrictions
 dependencies[] = ctools
 dependencies[] = entity_bundle_admin
 dependencies[] = entity_view_count
 dependencies[] = list
+dependencies[] = libraries
 dependencies[] = list
 dependencies[] = text
 dependencies[] = views
