@@ -89,10 +89,11 @@ class AppsEntityRestrictionsReports {
           ->fetchAllAssoc('created');
 
         if (!$result) {
-          return;
+          return array();
         }
 
         cache_set(self::BASIC_CACHE_KEY . $app->identifier(), $result, 'cache');
+        $evcs = $result;
       }
     }
 
@@ -100,20 +101,30 @@ class AppsEntityRestrictionsReports {
   }
 
   /**
-   * Calculate the hits for each day.
+   * Calculate the hits for each day per one month.
    *
-   * @param $months_and_days
-   *   The days and months which we need to build upon the hits.
+   * @param $month
+   *   The month for the hits. i.e: 09/15, 12/10
+   * @param $days
+   *   The days for that month.
+   * @param $app_id
+   *   The app ID.
    *
    * @return array
    *   The total, good and bad hits info.
    */
-  public static function calculateHits(array $months_and_days) {
-    return array(
-      [6, 9, 1,2,2,10,6,3,4,5,6,7,7,8,4,2,4],
-      [15, 1, 1,12,3,4,5,6,17,7,8,14,2,4,12,1,6],
-      [5, 9, 1,2,3,4,5,6,7,7,8,4,2,4,2,10,6]
-    );
+  public static function calculateHits($month, array $days, $app_id) {
+
+    $hits = array();
+
+    foreach ($days as $day) {
+      $date = $day . '/' . $month;
+      $hits[0][] = AppsEntityRestrictionsReports::countHits($date, 'passed', $app_id);
+      $hits[1][] = AppsEntityRestrictionsReports::countHits($date, 'failed', $app_id);
+      $hits[2][] = AppsEntityRestrictionsReports::countHits($date, 'total', $app_id);
+    }
+
+    return $hits;
   }
 
   /**
@@ -136,6 +147,36 @@ class AppsEntityRestrictionsReports {
         'object' => 'The app made a good @method request against @entity_type:@entity_id.',
       ),
     );
+  }
+
+  /**
+   * Count the number of hits per day.
+   *
+   * @param $date
+   *   The date of the hits.
+   * @param $type
+   *   The type of the counting: passed, failed or total.
+   * @param $app_id
+   *   The app id.
+   *
+   * @return integer
+   *   The number o hits.
+   */
+  private static function countHits($date, $type, $app_id) {
+    $query = new EntityFieldQuery();
+
+    $query
+      ->entityCondition('entity_type', 'entity_view_count')
+      ->propertyCondition('entity_type', 'apps_entity_restrictions')
+      ->propertyCondition('type', 'apps_usage')
+      ->propertyCondition('entity_id', $app_id)
+      ->fieldCondition('field_request_date', 'value', $date);
+
+    if ($type != 'total') {
+      $query->fieldCondition('field_request_status', 'value', $type);
+    }
+
+    return $query->count()->execute();
   }
 
 }
