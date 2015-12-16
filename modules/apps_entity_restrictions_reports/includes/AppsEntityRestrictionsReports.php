@@ -10,6 +10,15 @@ class AppsEntityRestrictionsReports {
   const BASIC_CACHE_KEY = 'aer_app_views_';
 
   /**
+   * Quick alias for the cache manager.
+   *
+   * @return AppsEntityRestrictionsReportsCacheManager
+   */
+  public static function cacheManager() {
+    return new AppsEntityRestrictionsReportsCacheManager();
+  }
+
+  /**
    * Check if the user have any permission to view reports.
    *
    * @param AppsEntityRestriction $app
@@ -48,7 +57,7 @@ class AppsEntityRestrictionsReports {
 
     foreach ($evcs as $evc) {
       $day = date('d', $evc->created);
-      $month = date('m/y', $evc->created);
+      $month = date('m/Y', $evc->created);
 
       if (empty($months[$month])) {
         $months[$month] = array();
@@ -104,7 +113,7 @@ class AppsEntityRestrictionsReports {
    * Calculate the hits for each day per one month.
    *
    * @param $month
-   *   The month for the hits. i.e: 09/15, 12/10
+   *   The month for the hits. i.e: 09/2015, 12/2010
    * @param $days
    *   The days for that month.
    * @param $app_id
@@ -125,28 +134,6 @@ class AppsEntityRestrictionsReports {
     }
 
     return $hits;
-  }
-
-  /**
-   * Hold list of logs messages.
-   *
-   * @return array
-   */
-  public static function logsList() {
-    return array(
-      'property_operation_not_allowed' => array(
-        'general' => 'The app made a bad @method request against @property for @entity_type.',
-        'object' => 'The app made a bad @method request against @property for @entity_type:@entity_id.',
-      ),
-      'general_operation_not_allowed' => array(
-        'general' => 'The app made a bad @method request against a @entity_type endpoint.',
-        'object' => 'The app made a bad @method request against @entity_type:@entity_id.',
-      ),
-      'general_operation_allowed' => array(
-        'general' => 'The app made a good @method request against a @entity_type.',
-        'object' => 'The app made a good @method request against @entity_type:@entity_id.',
-      ),
-    );
   }
 
   /**
@@ -177,6 +164,41 @@ class AppsEntityRestrictionsReports {
     }
 
     return $query->count()->execute();
+  }
+
+  /**
+   * Sorting callback; Sort months in descending order.
+   */
+  public static function orderMonths($a, $b) {
+    $strtotime = function($month_year) {
+      list($month, $year) = explode('/', $month_year);
+
+      return strtotime($month . '/1/' . $year);
+    };
+
+    return $strtotime($a) > $strtotime($b) ? -1 : 1;
+  }
+
+  /**
+   * Hold list of logs messages.
+   *
+   * @return array
+   */
+  public static function logsList() {
+    return array(
+      'property_operation_not_allowed' => array(
+        'general' => 'The app made a bad @method request against @property for @entity_type.',
+        'object' => 'The app made a bad @method request against @property for @entity_type:@entity_id.',
+      ),
+      'general_operation_not_allowed' => array(
+        'general' => 'The app made a bad @method request against a @entity_type endpoint.',
+        'object' => 'The app made a bad @method request against @entity_type:@entity_id.',
+      ),
+      'general_operation_allowed' => array(
+        'general' => 'The app made a good @method request against a @entity_type.',
+        'object' => 'The app made a good @method request against @entity_type:@entity_id.',
+      ),
+    );
   }
 
 }

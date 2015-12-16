@@ -21,7 +21,12 @@ function apps_entity_restrictions_reports_report_page(AppsEntityRestriction $app
 
   $months_and_days = AppsEntityRestrictionsReports::getViewsDays($app);
   $months = array_keys($months_and_days);
-  $hits = AppsEntityRestrictionsReports::calculateHits(reset($months), reset($months_and_days), $app->identifier());
+  usort($months, array('AppsEntityRestrictionsReports', 'orderMonths'));
+
+  // Get the closest month to now and display it.
+  $month = reset($months);
+
+  $hits = AppsEntityRestrictionsReports::calculateHits($month, $months_and_days[$month], $app->identifier());
   drupal_add_js(
     array(
       'chart' => array(
@@ -32,6 +37,7 @@ function apps_entity_restrictions_reports_report_page(AppsEntityRestriction $app
     ),
   'setting');
 
+  // todo add pager.
   $content = theme('aer_reports_graph');
   $content .= views_embed_view('apps_entity_request', 'application_logs', $app->identifier());
 

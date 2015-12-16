@@ -17,5 +17,8 @@ dependencies[] = views_content
 ; Static methods.
 files[] = includes/AppsEntityRestrictionsReports.php
 
+; Cache manager.
+files[] = includes/AppsEntityRestrictionsReportsCacheManager.php
+
 ; Tests
 files[] = tests/AppsEntityRestrictionsReportsBase.test
