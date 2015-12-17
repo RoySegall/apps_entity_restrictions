@@ -12,10 +12,26 @@ class AppsEntityRestrictionsReports {
   /**
    * Quick alias for the cache manager.
    *
+   * @param AppsEntityRestriction $app
+   *   The application instance.
+   *
    * @return AppsEntityRestrictionsReportsCacheManager
    */
-  public static function cacheManager() {
-    return new AppsEntityRestrictionsReportsCacheManager();
+  public static function cacheManager(AppsEntityRestriction $app) {
+    return new AppsEntityRestrictionsReportsCacheManager($app);
+  }
+
+  /**
+   * Get cache ID for application.
+   *
+   * @param AppsEntityRestriction $app
+   *   The application instance.
+   *
+   * @return string
+   *   The cache ID.
+   */
+  protected function getCacheId(AppsEntityRestriction $app) {
+    return AppsEntityRestrictionsReports::BASIC_CACHE_KEY . $app->identifier();
   }
 
   /**
@@ -55,6 +71,7 @@ class AppsEntityRestrictionsReports {
 
     $months = array();
 
+    // Cache the days calendar representation.
     foreach ($evcs as $evc) {
       $day = date('d', $evc->created);
       $month = date('m/Y', $evc->created);
@@ -86,7 +103,7 @@ class AppsEntityRestrictionsReports {
 
     if (!isset($evcs)) {
 
-      if ($cache = cache_get(self::BASIC_CACHE_KEY . $app->identifier())) {
+      if ($cache = cache_get(self::getCacheId($app->identifier()))) {
         $evcs = $cache->data;
       }
       else {
@@ -101,7 +118,7 @@ class AppsEntityRestrictionsReports {
           return array();
         }
 
-        cache_set(self::BASIC_CACHE_KEY . $app->identifier(), $result, 'cache');
+        cache_set(self::getCacheId($app->identifier()), $result, 'cache');
         $evcs = $result;
       }
     }
@@ -150,6 +167,7 @@ class AppsEntityRestrictionsReports {
    *   The number o hits.
    */
   private static function countHits($date, $type, $app_id) {
+    // Handle cache per day for each application.
     $query = new EntityFieldQuery();
 
     $query
@@ -199,6 +217,13 @@ class AppsEntityRestrictionsReports {
         'object' => 'The app made a good @method request against @entity_type:@entity_id.',
       ),
     );
+  }
+
+  /**
+   * Creating an entity view count entry.
+   */
+  public static function createEntityViewCount() {
+    // todo: create the entity view entry and update cache.
   }
 
 }
