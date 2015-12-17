@@ -160,6 +160,7 @@ function apps_entity_restrictions_reports_library() {
     ),
     'css' => array(
       $base_path . '/chartist.min.css' => array(),
+      drupal_get_path('module', 'apps_entity_restrictions_reports') . '/css/chartistjs.css' => array(),
     ),
   );
 
