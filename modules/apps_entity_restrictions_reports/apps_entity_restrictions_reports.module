@@ -33,6 +33,14 @@ function apps_entity_restrictions_reports_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $items['aprr/%apps_entity_restrictions/%/%'] = array(
+    'title' => 'Months pagination',
+    'access callback' => 'apps_entity_restrictions_reports_months_pagination_access',
+    'access arguments' => array(1),
+    'page callback' => 'apps_entity_restrictions_reports_months_pagination',
+    'page arguments' => array(1, 2, 3),
+  );
+
   return $items;
 }
 
@@ -168,4 +176,39 @@ function apps_entity_restrictions_reports_theme() {
       'path' => drupal_get_path('module', 'apps_entity_restrictions_reports') . '/templates',
     ),
   );
+}
+
+/**
+ * Access callback for the pagination reports.
+ *
+ * @param AppsEntityRestriction $app
+ *   The application instance.
+ *
+ * @return bool
+ */
+function apps_entity_restrictions_reports_months_pagination_access(AppsEntityRestriction $app) {
+  return AppsEntityRestrictionsReports::reportsAccess($app);
+}
+
+/**
+ * Page callback; Paginating through the available reports months is done via
+ * ajax. This function will return the information for the graph.
+ *
+ * @param AppsEntityRestriction $app
+ *   The application instance.
+ * @param $month
+ *   The month in the year.
+ * @param $year
+ *   The year.
+ */
+function apps_entity_restrictions_reports_months_pagination(AppsEntityRestriction $app, $month, $year) {
+  $months_and_days = AppsEntityRestrictionsReports::getViewsDays($app);
+  $date = $month . '/' . $year;
+
+  $hits = AppsEntityRestrictionsReports::calculateHits($date, $months_and_days[$date], $app->identifier());
+
+  drupal_json_output(array(
+    'days' => $months_and_days[$date],
+    'hits' => $hits,
+  ));
 }

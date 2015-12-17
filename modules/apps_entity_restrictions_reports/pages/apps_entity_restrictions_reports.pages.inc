@@ -31,14 +31,21 @@ function apps_entity_restrictions_reports_report_page(AppsEntityRestriction $app
     array(
       'chart' => array(
         'months' => $months,
-        'days' => $months_and_days,
+        'days' => $months_and_days[$month],
         'hits' => $hits,
+        'basePath' => url('aprr/' . $app->identifier(), array('absolute' => TRUE)),
       ),
     ),
   'setting');
 
-  // todo add pager.
-  $content = theme('aer_reports_graph');
+  $links = array();
+  foreach ($months as $month) {
+    $links[] = array('title' => $month, 'href' => $month);
+  }
+
+  $content = '';
+  $content .= theme('ctools_dropdown', array('title' => t('Navigate to other months'), 'links' => $links));
+  $content .= theme('aer_reports_graph');
   $content .= views_embed_view('apps_entity_request', 'application_logs', $app->identifier());
 
   return $content;

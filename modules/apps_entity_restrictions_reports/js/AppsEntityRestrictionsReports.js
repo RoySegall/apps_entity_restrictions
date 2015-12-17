@@ -1,5 +1,8 @@
 (function ($) {
 
+  /**
+   * Initialise the first chart.
+   */
   Drupal.behaviors.charts = {
     attach: function (context, settings) {
       var options = {
@@ -19,19 +22,55 @@
       };
 
       var charts = settings.chart;
-      var months = charts.months;
       var days = charts.days;
       var hits = charts.hits;
 
-      // keep the current month. Will be used for pagination.
-      var month_position = 0;
-
       var data = {
-        labels: days[months[month_position]],
+        labels: days,
         series: hits
       };
 
       new Chartist.Line('.ct-chart', data, options);
+    }
+  };
+
+  Drupal.behaviors.navigateBetweenCahrts = {
+    attach: function(context, settings) {
+
+      $('.ctools-dropdown-container a').click(function(event) {
+        event.preventDefault();
+
+        var elements = $(this).attr('href').split('/');
+        var year = elements[elements.length - 1];
+        var month = elements[elements.length - 2];
+
+        $.ajax({
+          type: 'GET',
+          url: Drupal.settings.chart.basePath + '/' + month + '/' + year,
+          dataType: 'json',
+          success: function (matches) {
+            console.log(matches);
+          },
+          error: function(data) {
+            console.log(data);
+          }
+        });
+
+        new Chartist.Line('.ct-chart', {
+          labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          series: [
+            [12, 9, 7, 8, 5],
+            [2, 1, 3.5, 7, 3],
+            [1, 3, 4, 5, 6]
+          ]
+        }, {
+          fullWidth: true,
+          chartPadding: {
+            right: 40
+          }
+        });
+
+      });
     }
   };
 
