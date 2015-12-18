@@ -9,20 +9,20 @@
 class AppsEntityRestrictionsReportsHitsCacheManager {
 
   /**
-   * @var AppsEntityRestriction
+   * @var AppsEntityRestrictionsReportsCacheManager
    *
-   * The application object.
+   * The cache manager instance.
    */
-  protected $app;
+  protected $cacheManager;
 
   /**
    * Constructing the object.
    *
-   * @param AppsEntityRestriction $app
-   *   The app instance.
+   * @param AppsEntityRestrictionsReportsCacheManager $cacheManager
+   *   The cache manager.
    */
-  function __construct(AppsEntityRestriction $app) {
-    $this->app = $app;
+  function __construct(AppsEntityRestrictionsReportsCacheManager $cacheManager) {
+    $this->cacheManager = $cacheManager;
   }
 
   /**

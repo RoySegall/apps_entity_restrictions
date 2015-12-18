@@ -36,9 +36,8 @@ class AppsEntityRestrictionsReportsCacheManager {
    */
   function __construct(AppsEntityRestriction $app) {
     $this->setApp($app);
-
-    $this->monthsManager = new AppsEntityRestrictionsReportsMonthsCacheManager($app);
-    $this->hitsManager = new AppsEntityRestrictionsReportsHitsCacheManager($app);
+    $this->monthsManager = new AppsEntityRestrictionsReportsMonthsCacheManager($this);
+    $this->hitsManager = new AppsEntityRestrictionsReportsHitsCacheManager($this);
   }
 
   /**
