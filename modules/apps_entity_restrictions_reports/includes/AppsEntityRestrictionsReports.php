@@ -230,9 +230,26 @@ class AppsEntityRestrictionsReports {
 
   /**
    * Creating an entity view count entry.
+   *
+   * @param $id
+   *   The id of the app.
+   * @param $status
+   *   The status information: passed or failed
+   * @param $info
+   *   The log text.
    */
-  public static function createEntityViewCount() {
-    // todo: create the entity view entry and update cache.
+  public static function createEntityViewCount($id, $status, $info) {
+    $evc = entity_view_count_create(array());
+    $evc->entity_id = $id;
+    $evc->entity_type = 'apps_entity_restrictions';
+    $evc->type = 'apps_usage';
+    $wrapper = entity_metadata_wrapper('entity_view_count', $evc);
+    $wrapper->field_request_status->set($status);
+    $wrapper->field_info->set($info);
+    $wrapper->field_request_date->set(date('d/m/Y', $evc->created));
+    $wrapper->save();
+
+    // todo Update the cache.
   }
 
 }
