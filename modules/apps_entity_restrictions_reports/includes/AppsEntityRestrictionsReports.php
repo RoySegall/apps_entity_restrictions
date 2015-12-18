@@ -87,7 +87,7 @@ class AppsEntityRestrictionsReports {
       $months[$month][] = $day;
     }
 
-    return ($months);
+    return $months;
   }
 
   /**

@@ -65,6 +65,9 @@ class AppsEntityRestrictionsReportsHitsCacheManager {
    *   The date we handling.
    * @param $type
    *   The type of the cache: total, passed or failed.
+   *
+   * @return mixed
+   *   The cached date hits.
    */
   public function getDateHits($date, $type) {
     $date = str_replace('/', '_', $date);

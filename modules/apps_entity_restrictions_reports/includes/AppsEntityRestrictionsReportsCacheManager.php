@@ -19,12 +19,7 @@ class AppsEntityRestrictionsReportsCacheManager {
   protected $app;
 
   /**
-   * @var AppsEntityRestrictionsReportsMonthsCacheManager
-   */
-  protected $monthsManager;
-
-  /**
-   * @var AppsEntityRestrictionsReportsMonthsCacheManager
+   * @var AppsEntityRestrictionsReportsHitsCacheManager
    */
   protected $hitsManager;
 
@@ -36,7 +31,6 @@ class AppsEntityRestrictionsReportsCacheManager {
    */
   function __construct(AppsEntityRestriction $app) {
     $this->setApp($app);
-    $this->monthsManager = new AppsEntityRestrictionsReportsMonthsCacheManager($this);
     $this->hitsManager = new AppsEntityRestrictionsReportsHitsCacheManager($this);
   }
 
@@ -61,13 +55,6 @@ class AppsEntityRestrictionsReportsCacheManager {
    */
   public function getApp() {
     return $this->app;
-  }
-
-  /**
-   * @return AppsEntityRestrictionsReportsMonthsCacheManager
-   */
-  public function getMonthsManager() {
-    return $this->monthsManager;
   }
 
   /**
