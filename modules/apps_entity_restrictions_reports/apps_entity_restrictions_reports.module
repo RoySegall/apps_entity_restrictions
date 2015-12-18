@@ -206,7 +206,7 @@ function apps_entity_restrictions_reports_months_pagination(AppsEntityRestrictio
   $months_and_days = AppsEntityRestrictionsReports::getViewsDays($app);
   $date = $month . '/' . $year;
 
-  $hits = AppsEntityRestrictionsReports::calculateHits($date, $months_and_days[$date], $app->identifier());
+  $hits = AppsEntityRestrictionsReports::calculateHits($date, $months_and_days[$date], $app);
 
   drupal_json_output(array(
     'days' => $months_and_days[$date],

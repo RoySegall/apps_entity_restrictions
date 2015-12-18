@@ -71,10 +71,42 @@ class AppsEntityRestrictionsReportsCacheManager {
   }
 
   /**
-   * @return AppsEntityRestrictionsReportsMonthsCacheManager
+   * @return AppsEntityRestrictionsReportsHitsCacheManager
    */
   public function getHitsManager() {
     return $this->hitsManager;
+  }
+
+  /**
+   * Return a cache information match to a cache ID.
+   *
+   * @param $suffix
+   *   A suffix added by tye different cache managers.
+   *
+   * @return mixed
+   *   The cache value.
+   */
+  public function getCache($suffix) {
+    $cid = AppsEntityRestrictionsReports::getCacheId($this->app) . ':' . $suffix;
+
+    if (!$cache = cache_get($cid)) {
+      return;
+    }
+
+    return $cache->data;
+  }
+
+  /**
+   * Caching the data.
+   *
+   * @param $suffix
+   *   A suffix added by tye different cache managers.
+   * @param $data
+   *   What we need to cache.
+   */
+  public function setCache($suffix, $data) {
+    $cid = AppsEntityRestrictionsReports::getCacheId($this->app) . ':' . $suffix;
+    return cache_set($cid, $data);
   }
 
 }

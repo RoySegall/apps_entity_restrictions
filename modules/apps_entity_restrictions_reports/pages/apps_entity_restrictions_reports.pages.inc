@@ -26,7 +26,7 @@ function apps_entity_restrictions_reports_report_page(AppsEntityRestriction $app
   // Get the closest month to now and display it.
   $month = reset($months);
 
-  $hits = AppsEntityRestrictionsReports::calculateHits($month, $months_and_days[$month], $app->identifier());
+  $hits = AppsEntityRestrictionsReports::calculateHits($month, $months_and_days[$month], $app);
   drupal_add_js(
     array(
       'chart' => array(

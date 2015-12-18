@@ -30,7 +30,7 @@ class AppsEntityRestrictionsReports {
    * @return string
    *   The cache ID.
    */
-  protected function getCacheId(AppsEntityRestriction $app) {
+  public static function getCacheId(AppsEntityRestriction $app) {
     return AppsEntityRestrictionsReports::BASIC_CACHE_KEY . $app->identifier();
   }
 
@@ -103,7 +103,7 @@ class AppsEntityRestrictionsReports {
 
     if (!isset($evcs)) {
 
-      if ($cache = cache_get(self::getCacheId($app->identifier()))) {
+      if ($cache = cache_get(self::getCacheId($app))) {
         $evcs = $cache->data;
       }
       else {
@@ -118,7 +118,7 @@ class AppsEntityRestrictionsReports {
           return array();
         }
 
-        cache_set(self::getCacheId($app->identifier()), $result, 'cache');
+        cache_set(self::getCacheId($app), $result, 'cache');
         $evcs = $result;
       }
     }
@@ -133,21 +133,21 @@ class AppsEntityRestrictionsReports {
    *   The month for the hits. i.e: 09/2015, 12/2010
    * @param $days
    *   The days for that month.
-   * @param $app_id
-   *   The app ID.
+   * @param AppsEntityRestriction $app
+   *   The app instance.
    *
    * @return array
    *   The total, good and bad hits info.
    */
-  public static function calculateHits($month, array $days, $app_id) {
+  public static function calculateHits($month, array $days, AppsEntityRestriction $app) {
 
     $hits = array();
 
     foreach ($days as $day) {
       $date = $day . '/' . $month;
-      $hits[0][] = AppsEntityRestrictionsReports::countHits($date, 'passed', $app_id);
-      $hits[1][] = AppsEntityRestrictionsReports::countHits($date, 'failed', $app_id);
-      $hits[2][] = AppsEntityRestrictionsReports::countHits($date, 'total', $app_id);
+      $hits[0][] = AppsEntityRestrictionsReports::countHits($date, 'passed', $app);
+      $hits[1][] = AppsEntityRestrictionsReports::countHits($date, 'failed', $app);
+      $hits[2][] = AppsEntityRestrictionsReports::countHits($date, 'total', $app);
     }
 
     return $hits;
@@ -160,13 +160,20 @@ class AppsEntityRestrictionsReports {
    *   The date of the hits.
    * @param $type
    *   The type of the counting: passed, failed or total.
-   * @param $app_id
-   *   The app id.
+   * @param AppsEntityRestriction $app
+   *   The app instance.
    *
    * @return integer
    *   The number o hits.
    */
-  private static function countHits($date, $type, $app_id) {
+  private static function countHits($date, $type, AppsEntityRestriction $app) {
+    /** @var AppsEntityRestrictionsReportsHitsCacheManager $cache_manager */
+    $cache_manager = AppsEntityRestrictionsReports::cacheManager($app)->getHitsManager();
+
+    if ($count = $cache_manager->getDateHits($date, $type)) {
+      return $count;
+    }
+
     // Handle cache per day for each application.
     $query = new EntityFieldQuery();
 
@@ -174,14 +181,16 @@ class AppsEntityRestrictionsReports {
       ->entityCondition('entity_type', 'entity_view_count')
       ->propertyCondition('entity_type', 'apps_entity_restrictions')
       ->propertyCondition('type', 'apps_usage')
-      ->propertyCondition('entity_id', $app_id)
+      ->propertyCondition('entity_id', $app->identifier())
       ->fieldCondition('field_request_date', 'value', $date);
 
     if ($type != 'total') {
       $query->fieldCondition('field_request_status', 'value', $type);
     }
 
-    return $query->count()->execute();
+    $count = $query->count()->execute();
+    $cache_manager->cacheDateHits($date, $count, $type);
+    return $count;
   }
 
   /**

@@ -26,17 +26,6 @@ class AppsEntityRestrictionsReportsHitsCacheManager {
   }
 
   /**
-   * check if the cache type exists.
-   *
-   * @param $type
-   *   The type of cache i.e. hits per date.
-   *
-   * @return bool
-   */
-  public function cacheExists($type) {
-  }
-
-  /**
    * Cache the hits per each day. This will be invoke after calculating the
    * final value and won't be used for summing hits type.
    *
@@ -48,6 +37,8 @@ class AppsEntityRestrictionsReportsHitsCacheManager {
    *   The type of the hit: total, passed or failed.
    */
   public function cacheDateHits($date, $value, $type) {
+    $date = str_replace('/', '_', $date);
+    $this->cacheManager->setCache($date . ':hits:' . $type, $value);
   }
 
   /**
@@ -76,6 +67,10 @@ class AppsEntityRestrictionsReportsHitsCacheManager {
    *   The type of the cache: total, passed or failed.
    */
   public function getDateHits($date, $type) {
+    $date = str_replace('/', '_', $date);
+    if ($cache = $this->cacheManager->getCache($date . ':hits:' . $type)) {
+      return $cache;
+    }
   }
 
 }
