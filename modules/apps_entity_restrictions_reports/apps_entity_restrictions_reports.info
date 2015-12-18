@@ -19,6 +19,8 @@ files[] = includes/AppsEntityRestrictionsReports.php
 
 ; Cache manager.
 files[] = includes/AppsEntityRestrictionsReportsCacheManager.php
+files[] = includes/AppsEntityRestrictionsReportsHitsCacheManager.php
+files[] = includes/AppsEntityRestrictionsReportsMonthsCacheManager.php
 
 ; Tests
 files[] = tests/AppsEntityRestrictionsReportsBase.test
