@@ -19,7 +19,11 @@ function apps_entity_restrictions_reports_report_page(AppsEntityRestriction $app
   // Add library.
   drupal_add_library('apps_entity_restrictions_reports', 'chartist-js');
 
-  $months_and_days = AppsEntityRestrictionsReports::getViewsDays($app);
+  if (!$months_and_days = AppsEntityRestrictionsReports::getViewsDays($app)) {
+    drupal_set_message(t('It seems there is not request for this app.'), 'warning');
+    return '';
+  }
+
   $months = array_keys($months_and_days);
   usort($months, array('AppsEntityRestrictionsReports', 'orderMonths'));
 

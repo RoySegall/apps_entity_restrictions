@@ -231,8 +231,8 @@ class AppsEntityRestrictionsReports {
   /**
    * Creating an entity view count entry.
    *
-   * @param $id
-   *   The id of the app.
+   * @param AppsEntityRestriction $app
+   *   The app instance.
    * @param $status
    *   The status information: passed or failed
    * @param $info
@@ -240,23 +240,32 @@ class AppsEntityRestrictionsReports {
    * @param $created
    *   The timestamp of the view. Optional.
    */
-  public static function createEntityViewCount($id, $status, $info, $created = NULL) {
+  public static function createEntityViewCount(AppsEntityRestriction $app, $status, $info, $created = NULL) {
     if (!$created) {
       $created = time();
     }
 
+    $date = date('d/m/Y', $created);
     $evc = entity_view_count_create(array());
-    $evc->entity_id = $id;
+    $evc->entity_id = $app->identifier();
     $evc->entity_type = 'apps_entity_restrictions';
     $evc->type = 'apps_usage';
     $evc->created = $created;
     $wrapper = entity_metadata_wrapper('entity_view_count', $evc);
     $wrapper->field_request_status->set($status);
     $wrapper->field_info->set($info);
-    $wrapper->field_request_date->set(date('d/m/Y', $created));
+    $wrapper->field_request_date->set($date);
     $wrapper->save();
 
     // todo Update the cache.
+    $cache_manager = AppsEntityRestrictionsReports::cacheManager($app)->getHitsManager();
+
+    // Update the total.
+    foreach (array('total', $status) as $type) {
+      $total = $cache_manager->getDateHits($date, $type) ? $cache_manager->getDateHits($date, $type) : 0;
+      $total++;
+      $cache_manager->cacheDateHits($date, $total, $type);
+    }
   }
 
 }
