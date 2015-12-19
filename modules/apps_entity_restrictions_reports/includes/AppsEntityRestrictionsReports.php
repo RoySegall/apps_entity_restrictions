@@ -104,7 +104,7 @@ class AppsEntityRestrictionsReports {
 
     if (!isset($evcs)) {
 
-      if ($cache = cache_get(self::getCacheId($app))) {
+      if ($cache = cache_get(self::getCacheId($app)) && !AppsEntityRestrictionsReports::cacheManager($app)->invalidated()) {
         $evcs = $cache->data;
       }
       else {
@@ -120,6 +120,7 @@ class AppsEntityRestrictionsReports {
         }
 
         cache_set(self::getCacheId($app), $result, 'cache');
+        AppsEntityRestrictionsReports::cacheManager($app)->invalidate();
         $evcs = $result;
       }
     }
@@ -259,13 +260,14 @@ class AppsEntityRestrictionsReports {
     $wrapper->field_request_date->set($date);
     $wrapper->save();
 
-    // todo Update the cache.
     $cache_manager = AppsEntityRestrictionsReports::cacheManager($app)->getHitsManager();
 
     // Update the total.
     foreach (array('total', $status) as $type) {
       $cache_manager->increaseDateHits($date, $type);
     }
+
+    AppsEntityRestrictionsReports::cacheManager($app)->needsRebuild();
   }
 
 }
