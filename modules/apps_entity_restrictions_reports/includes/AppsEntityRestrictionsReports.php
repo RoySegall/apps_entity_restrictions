@@ -237,16 +237,23 @@ class AppsEntityRestrictionsReports {
    *   The status information: passed or failed
    * @param $info
    *   The log text.
+   * @param $created
+   *   The timestamp of the view. Optional.
    */
-  public static function createEntityViewCount($id, $status, $info) {
+  public static function createEntityViewCount($id, $status, $info, $created = NULL) {
+    if (!$created) {
+      $created = time();
+    }
+
     $evc = entity_view_count_create(array());
     $evc->entity_id = $id;
     $evc->entity_type = 'apps_entity_restrictions';
     $evc->type = 'apps_usage';
+    $evc->created = $created;
     $wrapper = entity_metadata_wrapper('entity_view_count', $evc);
     $wrapper->field_request_status->set($status);
     $wrapper->field_info->set($info);
-    $wrapper->field_request_date->set(date('d/m/Y', $evc->created));
+    $wrapper->field_request_date->set(date('d/m/Y', $created));
     $wrapper->save();
 
     // todo Update the cache.
