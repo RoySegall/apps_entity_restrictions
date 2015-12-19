@@ -21,9 +21,10 @@ function apps_entity_restrictions_reports_drush_command() {
       'months' => dt('Specify the amount of months back from now to start hit the server. i.e - 6 months backward.'),
       'hits' => dt('How many hits per day should an application have.'),
       'good_hits' => dt('Define how many of the hits should be good hits. Bad hits will be calculate as the amount left to reach 100%'),
+      'fluid_hits' => dt('Define the hits per day as a dynamic value per day.'),
     ),
     'examples' => array(
-      'drush reports_generate 1 --months=6 --hits=20 --good_hits=40' => dt('Will generate 20 hits per day for the past 6 months when 40% are good hits when 60% is bad hits.'),
+      'drush reports_generate 1 --months=6 --hits=20 --good_hits=40 --fluid_hits=1' => dt('Will generate 20 hits per day for the past 6 months when 40% are good hits when 60% is bad hits.'),
     ),
     'aliases' => array('reports_generate'),
   );
@@ -32,11 +33,16 @@ function apps_entity_restrictions_reports_drush_command() {
 }
 
 function drush_apps_entity_restrictions_reports_generate_dummy_hits($id) {
+  drush_print_r(time());
   $months = drush_get_option('months', 6);
   $hits = drush_get_option('hits', 100);
   $good_hits = drush_get_option('good_hits', rand(0, 90));
   $date = new DateTime();
   $app = apps_entity_restrictions_load($id);
+
+  if (drush_get_option('fluid_hits', FALSE)) {
+    $original_hits = $hits;
+  }
 
   // Get the current timestamp and the timestamp {$months} ago.
   $current = time();
@@ -50,6 +56,11 @@ function drush_apps_entity_restrictions_reports_generate_dummy_hits($id) {
   for ($midnight_of_the_day = $first_day_time; $midnight_of_the_day < $current; $midnight_of_the_day = $midnight_of_the_day + 86400) {
 
     // Calculate how many request per hour we need to generate.
+    if (drush_get_option('fluid_hits', FALSE)) {
+      $min = ($original_hits * 50) / 100;
+      $hits = rand($min, $original_hits);
+    }
+
     $request_per_hour = $hits / 24;
     $good_hits_per_hour = round(($request_per_hour * $good_hits) / 100);
     $bad_hits_per_hour = round(($request_per_hour * (100 - $good_hits)) / 100);
