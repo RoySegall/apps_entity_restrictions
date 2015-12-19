@@ -19,6 +19,7 @@ function apps_entity_restrictions_reports_report_page(AppsEntityRestriction $app
   // Add library.
   drupal_add_library('apps_entity_restrictions_reports', 'chartist-js');
 
+  // todo: cache.
   if (!$months_and_days = AppsEntityRestrictionsReports::getViewsDays($app)) {
     drupal_set_message(t('It seems there is not request for this app.'), 'warning');
     return '';
