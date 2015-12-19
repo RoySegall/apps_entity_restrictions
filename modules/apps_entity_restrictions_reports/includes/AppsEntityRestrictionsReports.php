@@ -46,6 +46,7 @@ class AppsEntityRestrictionsReports {
    * @return bool
    */
   public static function reportsAccess(AppsEntityRestriction $app, stdClass $account = NULL) {
+
     if (empty($account)) {
       global $user;
       $account = user_load($user->uid);
@@ -241,6 +242,7 @@ class AppsEntityRestrictionsReports {
    *   The timestamp of the view. Optional.
    */
   public static function createEntityViewCount(AppsEntityRestriction $app, $status, $info, $created = NULL) {
+
     if (!$created) {
       $created = time();
     }
@@ -262,9 +264,7 @@ class AppsEntityRestrictionsReports {
 
     // Update the total.
     foreach (array('total', $status) as $type) {
-      $total = $cache_manager->getDateHits($date, $type) ? $cache_manager->getDateHits($date, $type) : 0;
-      $total++;
-      $cache_manager->cacheDateHits($date, $total, $type);
+      $cache_manager->increaseDateHits($date, $type);
     }
   }
 

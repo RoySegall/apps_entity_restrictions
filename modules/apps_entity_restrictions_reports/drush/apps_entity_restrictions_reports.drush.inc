@@ -81,5 +81,4 @@ function drush_apps_entity_restrictions_reports_generate_dummy_hits($id) {
       }
     }
   }
-
 }

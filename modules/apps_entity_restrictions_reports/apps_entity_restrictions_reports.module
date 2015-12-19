@@ -23,7 +23,7 @@ function apps_entity_restrictions_reports_menu() {
 
   $items['admin/apps/%apps_entity_restrictions/reports'] = array(
     'title' => 'Reports',
-    'description' => 'View reports of the user.',
+    'description' => 'View reports of the application.',
     'access callback' => 'apps_entity_restrictions_reports_access',
     'access arguments' => array(2),
     'page callback' => 'apps_entity_restrictions_reports_report_page',
@@ -184,8 +184,8 @@ function apps_entity_restrictions_reports_months_pagination_access(AppsEntityRes
 }
 
 /**
- * Page callback; Paginating through the available reports months is done via
- * ajax. This function will return the information for the graph.
+ * Page callback; Paginating through the available reports months done via ajax.
+ * This function will return the days and their information for each month.
  *
  * @param AppsEntityRestriction $app
  *   The application instance.

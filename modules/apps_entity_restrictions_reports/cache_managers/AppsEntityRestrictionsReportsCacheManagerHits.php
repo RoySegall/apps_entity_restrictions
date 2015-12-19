@@ -33,16 +33,19 @@ class AppsEntityRestrictionsReportsCacheManagerHits extends AppsEntityRestrictio
    * @param $date
    *   The date we handling.
    * @param $status
-   *   The status of the request: failed or pass. This will also increase the
-   *   total hits for the date.
+   *   The status of the request: total, failed or pass. This will also increase
+   *   the total hits for the date.
    */
   public function increaseDateHits($date, $status) {
+    $total = $this->getDateHits($date, $status) ? $this->getDateHits($date, $status) : 0;
+    $total++;
+    $this->cacheDateHits($date, $total, $status);
   }
 
   /**
    * Retrieve the cache value for a date.
    *
-   * This will be used when increasing a hit.
+   * This will be used when increasing a hit or asking information for a date.
    *
    * @param $date
    *   The date we handling.
