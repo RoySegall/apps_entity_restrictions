@@ -6,24 +6,7 @@
  * Contains AppsEntityRestrictionsReportsHitsCacheManager
  */
 
-class AppsEntityRestrictionsReportsHitsCacheManager {
-
-  /**
-   * @var AppsEntityRestrictionsReportsCacheManager
-   *
-   * The cache manager instance.
-   */
-  protected $cacheManager;
-
-  /**
-   * Constructing the object.
-   *
-   * @param AppsEntityRestrictionsReportsCacheManager $cacheManager
-   *   The cache manager.
-   */
-  function __construct(AppsEntityRestrictionsReportsCacheManager $cacheManager) {
-    $this->cacheManager = $cacheManager;
-  }
+class AppsEntityRestrictionsReportsCacheManagerHits extends AppsEntityRestrictionsReportsCacheManagerBase {
 
   /**
    * Cache the hits per each day. This will be invoke after calculating the
