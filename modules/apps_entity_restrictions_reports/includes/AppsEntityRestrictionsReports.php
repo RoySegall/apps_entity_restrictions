@@ -169,7 +169,7 @@ class AppsEntityRestrictionsReports {
    *   The number o hits.
    */
   private static function countHits($date, $type, AppsEntityRestriction $app) {
-    /** @var AppsEntityRestrictionsReportsHitsCacheManager $cache_manager */
+    /** @var AppsEntityRestrictionsReportsCacheManagerHits $cache_manager */
     $cache_manager = AppsEntityRestrictionsReports::cacheManager($app)->getHitsManager();
 
     if ($count = $cache_manager->getDateHits($date, $type)) {

@@ -1,0 +1,103 @@
+<?php
+
+/**
+ * @file
+ * Contains \AppsEntityRestrictionsRestfulBaseTest.
+ */
+
+class AppsEntityRestrictionsReportsCacheManagerTest extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Apps entity restrictions reports cache manager',
+      'description' => 'Test cache manager.',
+      'group' => 'Apps entity restrictions',
+    );
+  }
+
+  /**
+   * @var AppsEntityRestriction
+   */
+  protected $app;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp(array('apps_entity_restrictions_example', 'apps_entity_restrictions_reports'));
+
+    // Create application.
+    $this->app = apps_entity_restrictions_create();
+    $this->app
+      ->setTitle('Demo application')
+      ->allow('node', 'methods', 'get')
+      ->allow('node', 'properties', 'nid')
+      ->save();
+  }
+
+  /**
+   * Testing the hits tracking and the cache manager as well.
+   */
+  public function testHitsCaching() {
+    // Keep the dates and the hits per day.
+    $dates = array(
+      '01/01/2015' => 4,
+      '01/02/2015' => 10,
+
+      '02/01/2015' => 6,
+      '02/02/2015' => 20,
+    );
+
+    foreach ($dates as $date => $hits) {
+      for ($i = 0; $i < $hits; $i++) {
+        AppsEntityRestrictionsReports::createEntityViewCount($this->app, $i % 2 == 0 ? 'Passed' : 'Failed', 'Dummy hits', strtotime($date));
+      }
+    }
+
+    $months_and_days = AppsEntityRestrictionsReports::getViewsDays($this->app);
+
+    // Get the hits for the first month.
+    $hits = AppsEntityRestrictionsReports::calculateHits('01/2015', $months_and_days['01/2015'], $this->app);
+    $this->checkSumHits($hits, 7, 7, 14, 'The hits for the first month logged as expected');
+
+    // Get the hits for the second month.
+    $hits = AppsEntityRestrictionsReports::calculateHits('02/2015', $months_and_days['02/2015'], $this->app);
+    $this->checkSumHits($hits, 13, 13, 26, 'The hits for the second month logged as expected');
+
+
+    $dates = array(
+      '01/01/2015' => 4,
+      '02/01/2015' => 10,
+
+      '01/02/2015' => 6,
+      '02/02/2015' => 20,
+    );
+    // Check the cache manager for each day.
+    foreach ($dates as $date => $hits) {
+      $total_hits = AppsEntityRestrictionsReports::cacheManager($this->app)->getHitsManager()->getDateHits($date, 'total');
+      $this->assertEqual($total_hits, $hits, format_string('The total hits from the cache for the date @date are @hits.', array('@hits' => $hits, '@date' => $date)));
+    }
+  }
+
+  /**
+   * Test the expected hits with a helper function.
+   *
+   * @param $hits
+   *   The hits for the month.
+   * @param $passed
+   *   Total number of passed hits.
+   * @param $failed
+   *   The total number of failed hits.
+   * @param $total
+   *   The total hits.
+   * @param $text
+   *   Text for the assertion method.
+   */
+  protected function checkSumHits($hits, $passed, $failed, $total, $text) {
+    $passed = array_sum($hits[0]) == $passed;
+    $failed = array_sum($hits[1]) == $failed;
+    $total = array_sum($hits[2]) == $total;
+    $this->assertTrue($failed && $passed && $total, $text);
+  }
+
+}

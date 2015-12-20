@@ -26,3 +26,4 @@ files[] = cache_managers/AppsEntityRestrictionsReportsCacheManagerHits.php
 
 ; Tests
 files[] = tests/AppsEntityRestrictionsReportsBase.test
+files[] = tests/AppsEntityRestrictionsReportsCacheManagerTest.test
