@@ -157,6 +157,7 @@ class AppsEntityRestrictionsReports {
         ->loadMultiple();
 
       if ($results && count($results) == 3) {
+        //todo: check why we get bad results.
         foreach ($results as $i => $result) {
           $hits[$i][] = $result->data;
         }
