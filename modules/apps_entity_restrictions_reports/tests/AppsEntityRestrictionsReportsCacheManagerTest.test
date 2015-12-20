@@ -64,7 +64,6 @@ class AppsEntityRestrictionsReportsCacheManagerTest extends DrupalWebTestCase {
     $hits = AppsEntityRestrictionsReports::calculateHits('02/2015', $months_and_days['02/2015'], $this->app);
     $this->checkSumHits($hits, 13, 13, 26, 'The hits for the second month logged as expected');
 
-
     $dates = array(
       '01/01/2015' => 4,
       '02/01/2015' => 10,

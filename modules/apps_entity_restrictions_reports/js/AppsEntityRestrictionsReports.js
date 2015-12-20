@@ -30,7 +30,7 @@
           success: function (matches) {
             Drupal.behaviors.graph.generate(matches.days, matches.hits);
 
-            // That's it. Remove the pager.
+            // Hide the pager.
             $('.ctools-dropdown-link-wrapper .ajax-progress').remove();
           },
           error: function(data) {

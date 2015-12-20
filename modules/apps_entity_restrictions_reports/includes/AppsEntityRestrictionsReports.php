@@ -7,8 +7,6 @@
 
 class AppsEntityRestrictionsReports {
 
-  const BASIC_CACHE_KEY = 'aer_app_views_';
-
   /**
    * Quick alias for the cache manager.
    *
@@ -31,7 +29,7 @@ class AppsEntityRestrictionsReports {
    *   The cache ID.
    */
   public static function getCacheId(AppsEntityRestriction $app) {
-    return AppsEntityRestrictionsReports::BASIC_CACHE_KEY . $app->identifier();
+    return 'aer_app_views_' . $app->identifier();
   }
 
   /**
