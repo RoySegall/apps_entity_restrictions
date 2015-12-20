@@ -143,11 +143,29 @@ class AppsEntityRestrictionsReports {
 
     $hits = array();
 
+    $cache_manager = self::cacheManager($app);
+    $hits_manager = $cache_manager->getHitsManager();
+
     foreach ($days as $day) {
       $date = $day . '/' . $month;
-      $hits[0][] = AppsEntityRestrictionsReports::countHits($date, 'passed', $app);
-      $hits[1][] = AppsEntityRestrictionsReports::countHits($date, 'failed', $app);
-      $hits[2][] = AppsEntityRestrictionsReports::countHits($date, 'total', $app);
+
+      $results = $cache_manager
+        ->resetCacheIds()
+        ->addCacheId($cache_manager->getCacheId($hits_manager->getSuffix($date, 'passed')))
+        ->addCacheId($cache_manager->getCacheId($hits_manager->getSuffix($date, 'failed')))
+        ->addCacheId($cache_manager->getCacheId($hits_manager->getSuffix($date, 'total')))
+        ->loadMultiple();
+
+      if ($results && count($results) == 3) {
+        foreach ($results as $i => $result) {
+          $hits[$i][] = $result->data;
+        }
+      }
+      else {
+        $hits[0][] = AppsEntityRestrictionsReports::countHits($date, 'passed', $app);
+        $hits[1][] = AppsEntityRestrictionsReports::countHits($date, 'failed', $app);
+        $hits[2][] = AppsEntityRestrictionsReports::countHits($date, 'total', $app);
+      }
     }
 
     return $hits;

@@ -24,6 +24,13 @@ class AppsEntityRestrictionsReportsCacheManager {
   protected $hitsManager;
 
   /**
+   * @var array
+   *
+   * The cache IDs. Will be used for loading multiple caches.
+   */
+  protected $cids = array();
+
+  /**
    * Constructing the object.
    *
    * @param AppsEntityRestriction $app
@@ -74,9 +81,8 @@ class AppsEntityRestrictionsReportsCacheManager {
    *   The cache value.
    */
   public function getCache($suffix) {
-    $cid = AppsEntityRestrictionsReports::getCacheId($this->app) . ':' . $suffix;
 
-    if (!$cache = cache_get($cid)) {
+    if (!$cache = cache_get($this->getCacheId($suffix))) {
       return;
     }
 
@@ -92,8 +98,7 @@ class AppsEntityRestrictionsReportsCacheManager {
    *   What we need to cache.
    */
   public function setCache($suffix, $data) {
-    $cid = AppsEntityRestrictionsReports::getCacheId($this->app) . ':' . $suffix;
-    return cache_set($cid, $data);
+    return cache_set($this->getCacheId($suffix), $data);
   }
 
   /**
@@ -126,6 +131,54 @@ class AppsEntityRestrictionsReportsCacheManager {
   public function invalidated() {
     $apps = variable_get('apps_entity_restrictions_reports_app_need_rebuild');
     return in_array($this->getApp()->identifier(), $apps);
+  }
+
+  /**
+   * Constructing the cache ID.
+   *
+   * @param $suffix
+   *   The suffix added by the cache managers.
+   *
+   * @return string
+   *   The cache ID for the cache manager.
+   */
+  public function getCacheId($suffix) {
+    return AppsEntityRestrictionsReports::getCacheId($this->app) . ':' . $suffix;
+  }
+
+  /**
+   * Load multiple caches at once.
+   *
+   * @return array
+   *   The cache objects.
+   */
+  public function loadMultiple() {
+    return array_values(cache_get_multiple($this->cids));
+  }
+
+  /**
+   * Resting the cache IDs property.
+   *
+   * @return AppsEntityRestrictionsReportsCacheManager
+   */
+  public function resetCacheIds() {
+    $this->cids = array();
+
+    return $this;
+  }
+
+  /**
+   * Add a cache ID to the list of cache IDs.
+   *
+   * @param $id
+   *   The cache ID.
+   *
+   * @return AppsEntityRestrictionsReportsCacheManager
+   */
+  public function addCacheId($id) {
+    $this->cids[] = $id;
+
+    return $this;
   }
 
 }

@@ -20,26 +20,7 @@ class AppsEntityRestrictionsReportsCacheManagerHits extends AppsEntityRestrictio
    *   The type of the hit: total, passed or failed.
    */
   public function cacheDateHits($date, $value, $type) {
-    $date = str_replace('/', '_', $date);
-    $this->cacheManager->setCache($date . ':hits:' . $type, $value);
-  }
-
-  /**
-   * Increasing the value of the hit for a date.
-   *
-   * Unlike caching the total hits info for a date, this will be invoke once a
-   * entity view count has created.
-   *
-   * @param $date
-   *   The date we handling.
-   * @param $status
-   *   The status of the request: total, failed or pass. This will also increase
-   *   the total hits for the date.
-   */
-  public function increaseDateHits($date, $status) {
-    $total = $this->getDateHits($date, $status) ? $this->getDateHits($date, $status) : 0;
-    $total++;
-    $this->cacheDateHits($date, $total, $status);
+    $this->cacheManager->setCache($this->getSuffix($date, $type), $value);
   }
 
   /**
@@ -56,10 +37,42 @@ class AppsEntityRestrictionsReportsCacheManagerHits extends AppsEntityRestrictio
    *   The cached date hits.
    */
   public function getDateHits($date, $type) {
-    $date = str_replace('/', '_', $date);
-    if ($cache = $this->cacheManager->getCache($date . ':hits:' . $type)) {
+    if ($cache = $this->cacheManager->getCache($this->getSuffix($date, $type))) {
       return $cache;
     }
+  }
+
+  /**
+   * Get the suffix for the cache manager.
+   *
+   * @param $date
+   *   The date we handling.
+   * @param $type
+   *   The type of the cache: total, passed or failed.
+   *
+   * @return string
+   *   The suffix.
+   */
+  public function getSuffix($date, $type) {
+    $date = str_replace('/', '_', $date);
+    return $date . ':hits:' . $type;
+  }
+
+  /**
+   * Increasing the value of the hit for a date.
+   *
+   * Unlike caching the total hits info for a date, this will be invoke once a
+   * entity view count has created.
+   *
+   * @param $date
+   *   The date we handling.
+   * @param $status
+   *   The status of the request: total, failed or pass.
+   */
+  public function increaseDateHits($date, $status) {
+    $total = $this->getDateHits($date, $status) ? $this->getDateHits($date, $status) : 0;
+    $total++;
+    $this->cacheDateHits($date, $total, $status);
   }
 
 }
