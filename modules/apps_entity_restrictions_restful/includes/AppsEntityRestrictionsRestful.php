@@ -147,20 +147,39 @@ class AppsEntityRestrictionsRestful {
       return RestfulInterface::ACCESS_IGNORE;
     }
 
-    return $app->entityPropertyAccess($op_replacement[$op], $wrapper->type(), $info['name']) ? RestfulInterface::ACCESS_ALLOW : RestfulInterface::ACCESS_DENY;
+    if (!$app->entityPropertyAccess($op_replacement[$op], $wrapper->type(), $info['name'])) {
+
+      if ($op_replacement[$op] != strtolower(RestfulInterface::GET)) {
+        // We would like to notify bad properties access except for GET since
+        // those request would occur deliberately.
+        $app->dispatch(array(
+          'reason' => 'property_operation_not_allowed',
+          'method' => $op,
+          'property' => $public_field_name,
+          'entity_type' => $wrapper->type(),
+          'entity_id' => $wrapper->getIdentifier(),
+        ));
+      }
+
+      return RestfulInterface::ACCESS_DENY;
+    }
+
+    // A good request against a property should happen more often. There for
+    // this won't be recorded since the records number got be very very high.
+    return RestfulInterface::ACCESS_ALLOW;
   }
 
   /**
    * Helper static methods for all the base controllers.
    *
-   * @param RestfulBase $controller
+   * @param RestfulEntityBase $controller
    *   The controllers instance.
    *
    * @return bool
    * @throws AppsEntityRestrictionsException
    * @throws RestfulBadRequestException
    */
-  static public function checkEntityAccess(RestfulBase $controller) {
+  static public function checkEntityAccess(RestfulEntityBase $controller) {
     if (!$controller->getApp()) {
 
       if (!$app = AppsEntityRestrictionsRestful::loadByHeaders($controller->getRequest())) {
@@ -170,12 +189,34 @@ class AppsEntityRestrictionsRestful {
       $controller->setApp($app);
     }
 
+    /** @var AppsEntityRestriction $app */
+    $app = $controller->getApp();
+
     $method = $controller->getMethod();
     if (in_array($controller->getMethod(), array(RestfulInterface::PATCH, RestfulInterface::PUT))) {
       $method = 'update';
     }
 
-    return $controller->getApp()->entityAccess(strtolower($method), $controller->getEntityType());
+    if (!$app->entityAccess(strtolower($method), $controller->getEntityType())) {
+      // Return false and notify listeners for a bad request.
+      $app->dispatch(array(
+        'reason' => 'general_operation_not_allowed',
+        'method' => $method,
+        'entity_type' => $controller->getEntityType(),
+        'entity_id' => $controller->getPath(),
+      ));
+      return FALSE;
+    }
+
+    // Notify listeners for a good request.
+    $app->dispatch(array(
+      'reason' => 'general_operation_allowed',
+      'method' => $method,
+      'entity_type' => $controller->getEntityType(),
+      'entity_id' => $controller->getPath(),
+    ));
+
+    return TRUE;
   }
 
 }

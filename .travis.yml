@@ -39,9 +39,15 @@ before_script:
   # reference and enable apps_entity_restrictions in build site
   - ln -s $(readlink -e $(cd -)) drupal/drupal/sites/all/modules/apps_entity_restrictions
   - cd drupal/drupal
-  - drush dl restful-7.x-1.6
-  - ls -al
-  - drush --yes pm-enable apps_entity_restrictions apps_entity_restrictions_restful
+
+  # Gettin the moudles.
+  - drush dl restful-7.x-1.6 ctools
+  - cd sites/all/modules
+  - git clone https://github.com/DrupalHub/entity_view_count.git
+  - cd -
+
+  # Enaabling the modules.
+  - drush --yes pm-enable apps_entity_restrictions apps_entity_restrictions_restful apps_entity_restrictions_reports
 
   # Patch Entity API.
   - curl -O https://www.drupal.org/files/issues/2086225-entity-access-check-node-create-3.patch
