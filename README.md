@@ -96,3 +96,9 @@ class AppsEntityRestrictionsExampleArticle extends RestfulEntityBaseNode {
 
 }
 ```
+
+## Reports section
+
+Download [chartist js](https://gionkunz.github.io/chartist-js/) into the 
+libraries folder. Make sure the files `chartist.min.js` and `chartist.min.css`
+located at the root of the folder.

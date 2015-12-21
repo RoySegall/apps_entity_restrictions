@@ -378,4 +378,15 @@ class AppsEntityRestriction extends Entity {
     return in_array($property, $this->need[$entity_type]['properties']) ? TRUE : FALSE;
   }
 
+  /**
+   * Dispatching event relate to the app.
+   *
+   * @param array $info
+   *   The info of the event. Can hold information relate to the current request
+   *   and the event.
+   */
+  public function dispatch(array $info = array()) {
+    module_invoke_all('apps_entity_restriction_app_event_listener', $this, $info);
+  }
+
 }
