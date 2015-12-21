@@ -41,7 +41,7 @@ before_script:
   - cd drupal/drupal
 
   # Gettin the moudles.
-  - drush dl restful-7.x-1.6
+  - drush dl restful-7.x-1.6 ctools
   - cd sites/all/modules
   - git clone https://github.com/DrupalHub/entity_view_count.git
   - cd -

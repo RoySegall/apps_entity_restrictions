@@ -16,6 +16,42 @@ function apps_entity_restrictions_reports_entity_info_alter(&$entity_info) {
 }
 
 /**
+ * Implements hook_menu().
+ */
+function apps_entity_restrictions_reports_menu() {
+  $items = array();
+
+  $items['admin/apps/%apps_entity_restrictions/reports'] = array(
+    'title' => 'Reports',
+    'description' => 'View reports of the application.',
+    'access callback' => 'apps_entity_restrictions_reports_access',
+    'access arguments' => array(2),
+    'page callback' => 'apps_entity_restrictions_reports_report_page',
+    'page arguments' => array(2),
+    'file' => 'apps_entity_restrictions_reports.pages.inc',
+    'file path' => drupal_get_path('module', 'apps_entity_restrictions_reports') . '/pages/',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['aprr/%apps_entity_restrictions/%/%'] = array(
+    'title' => 'Months pagination',
+    'access callback' => 'apps_entity_restrictions_reports_months_pagination_access',
+    'access arguments' => array(1),
+    'page callback' => 'apps_entity_restrictions_reports_months_pagination',
+    'page arguments' => array(1, 2, 3),
+  );
+
+  return $items;
+}
+
+/**
+ * Access callback; Check if the user have access to the view reports.
+ */
+function apps_entity_restrictions_reports_access(AppsEntityRestriction $app) {
+  return AppsEntityRestrictionsReports::reportsAccess($app);
+}
+
+/**
  * Implements hook_permission().
  */
 function apps_entity_restrictions_reports_permission() {
@@ -23,6 +59,14 @@ function apps_entity_restrictions_reports_permission() {
     'manage entity view count fields' => array(
       'title' => t('Manage entity view count fields'),
       'description' => t('Grant this permission to users which can manage entity view count fields.'),
+    ),
+    'view owned application reports' => array(
+      'title' => t('View owned application reports'),
+      'description' => t('Grant to the user permission to view reports relate to application he own.'),
+    ),
+    'view any application reports' => array(
+      'title' => t('View any application reports'),
+      'description' => t('Grant to the user permission to view reports relate to any application.'),
     ),
   );
 }
@@ -58,36 +102,106 @@ function apps_entity_restrictions_reports_apps_entity_restriction_app_event_list
     '@entity_id' => $info['entity_id'],
   );
 
-  $evc = entity_view_count_create(array());
-  $evc->entity_id = $app->getId();
-  $evc->entity_type = 'apps_entity_restrictions';
-  $evc->type = 'apps_usage';
-
-  $wrapper = entity_metadata_wrapper('entity_view_count', $evc);
-
-  $logs = array(
-    'property_operation_not_allowed' => array(
-      'general' => 'The app made a bad @method request against @property for @entity_type.',
-      'object' => 'The app made a bad @method request against @property for @entity_type:@entity_id.',
-    ),
-    'general_operation_not_allowed' => array(
-      'general' => 'The app made a bad @method request against a @entity_type endpoint.',
-      'object' => 'The app made a bad @method request against @entity_type:@entity_id.',
-    ),
-    'general_operation_allowed' => array(
-      'general' => 'The app made a good @method request against a @entity_type.',
-      'object' => 'The app made a good @method request against @entity_type:@entity_id.',
-    ),
-  );
-
   if ($info['reason'] == 'property_operation_not_allowed') {
     $parameters['@property'] = $info['property'];
   }
 
+  $logs = AppsEntityRestrictionsReports::logsList();
   $log_message = empty($info['entity_id']) ? $logs[$info['reason']]['general'] : $logs[$info['reason']]['object'];
   $status = $info['reason'] == 'general_operation_allowed' ? 'Passed' : 'Failed';
 
-  $wrapper->field_request_status->set($status);
-  $wrapper->field_info->set(format_string($log_message, $parameters));
-  $wrapper->save();
+  AppsEntityRestrictionsReports::createEntityViewCount($app, $status, format_string($log_message, $parameters));
+}
+
+/**
+ * Implements hook_apps_entity_restrictions_app_options_alter().
+ */
+function apps_entity_restrictions_reports_apps_entity_restrictions_app_options_alter(&$items, AppsEntityRestriction $app) {
+  if (!AppsEntityRestrictionsReports::reportsAccess($app)) {
+    return;
+  }
+
+  $items[] = $app->generateLink('apps_reports');
+}
+
+/**
+ * Implements hook_apps_entity_restrictions_generate_links_action_alter().
+ */
+function apps_entity_restrictions_reports_apps_entity_restrictions_generate_links_action_alter(&$actions, AppsEntityRestriction $app) {
+  $actions['apps_reports'] = array(
+    'title' => t('Reports'),
+    'href' => 'admin/apps/' . $app->id . '/reports',
+  );
+}
+
+/**
+ * Implements hook_library().
+ */
+function apps_entity_restrictions_reports_library() {
+  $libraries = array();
+
+  $base_path = libraries_get_path('chartist-js');
+
+  $libraries['chartist-js'] = array(
+    'title' => t('Chartlist JS'),
+    'website' => 'https://github.com/gionkunz/chartist-js',
+    'version' => '1.0',
+    'js' => array(
+      $base_path . '/chartist.min.js' => array(),
+      drupal_get_path('module', 'apps_entity_restrictions_reports') . '/js/AppsEntityRestrictionsReports.js' => array(),
+    ),
+    'css' => array(
+      $base_path . '/chartist.min.css' => array(),
+      drupal_get_path('module', 'apps_entity_restrictions_reports') . '/css/chartistjs.css' => array(),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function apps_entity_restrictions_reports_theme() {
+  return array(
+    'aer_reports_graph' => array(
+      'template' => 'aer-reports-graph',
+      'path' => drupal_get_path('module', 'apps_entity_restrictions_reports') . '/templates',
+    ),
+  );
+}
+
+/**
+ * Access callback for the pagination reports.
+ *
+ * @param AppsEntityRestriction $app
+ *   The application instance.
+ *
+ * @return bool
+ */
+function apps_entity_restrictions_reports_months_pagination_access(AppsEntityRestriction $app) {
+  return AppsEntityRestrictionsReports::reportsAccess($app);
+}
+
+/**
+ * Page callback; Paginating through the available reports months done via ajax.
+ * This function will return the days and their information for each month.
+ *
+ * @param AppsEntityRestriction $app
+ *   The application instance.
+ * @param $month
+ *   The month in the year.
+ * @param $year
+ *   The year.
+ */
+function apps_entity_restrictions_reports_months_pagination(AppsEntityRestriction $app, $month, $year) {
+  $months_and_days = AppsEntityRestrictionsReports::getViewsDays($app);
+  $date = $month . '/' . $year;
+
+  $hits = AppsEntityRestrictionsReports::calculateHits($date, $months_and_days[$date], $app);
+
+  drupal_json_output(array(
+    'days' => $months_and_days[$date],
+    'hits' => $hits,
+  ));
 }

@@ -4,14 +4,26 @@ package = Apps entity restrictions
 core = 7.x
 
 dependencies[] = apps_entity_restrictions
+dependencies[] = ctools
 dependencies[] = entity_bundle_admin
 dependencies[] = entity_view_count
-dependencies[] = views
+dependencies[] = list
+dependencies[] = libraries
 dependencies[] = list
 dependencies[] = text
+dependencies[] = views
+dependencies[] = views_content
 
 ; Static methods.
 files[] = includes/AppsEntityRestrictionsReports.php
 
+; Cache manager.
+files[] = includes/AppsEntityRestrictionsReportsCacheManager.php
+files[] = includes/AppsEntityRestrictionsReportsCacheManagerBase.php
+
+; Caches
+files[] = cache_managers/AppsEntityRestrictionsReportsCacheManagerHits.php
+
 ; Tests
 files[] = tests/AppsEntityRestrictionsReportsBase.test
+files[] = tests/AppsEntityRestrictionsReportsCacheManagerTest.test
