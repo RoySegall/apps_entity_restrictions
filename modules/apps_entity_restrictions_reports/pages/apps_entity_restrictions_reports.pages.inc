@@ -31,6 +31,11 @@ function apps_entity_restrictions_reports_report_page(AppsEntityRestriction $app
   // Get the closest month to now and display it.
   $month = reset($months);
 
+  if (count($months_and_days[$month]) === 1) {
+    drupal_set_message(t('The graph can not be generated for a single day.'), 'warning');
+    return '';
+  }
+
   $hits = AppsEntityRestrictionsReports::calculateHits($month, $months_and_days[$month], $app);
   drupal_add_js(
     array(
