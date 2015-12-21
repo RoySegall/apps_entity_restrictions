@@ -153,7 +153,7 @@ class AppsEntityRestrictionsReportsCacheManager {
    *   The cache objects.
    */
   public function loadMultiple() {
-    return array_values(cache_get_multiple($this->cids));
+    return cache_get_multiple($this->cids);
   }
 
   /**

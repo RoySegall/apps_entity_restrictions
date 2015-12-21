@@ -157,10 +157,9 @@ class AppsEntityRestrictionsReports {
         ->loadMultiple();
 
       if ($results && count($results) == 3) {
-        //todo: check why we get bad results.
-        foreach ($results as $i => $result) {
-          $hits[$i][] = $result->data;
-        }
+        $hits[0][] = $results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'passed'))]->data;
+        $hits[1][] = $results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'failed'))]->data;
+        $hits[2][] = $results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'total'))]->data;
       }
       else {
         $hits[0][] = AppsEntityRestrictionsReports::countHits($date, 'passed', $app);

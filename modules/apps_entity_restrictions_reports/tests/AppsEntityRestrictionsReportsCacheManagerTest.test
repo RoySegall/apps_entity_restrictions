@@ -50,7 +50,7 @@ class AppsEntityRestrictionsReportsCacheManagerTest extends DrupalWebTestCase {
 
     foreach ($dates as $date => $hits) {
       for ($i = 0; $i < $hits; $i++) {
-        AppsEntityRestrictionsReports::createEntityViewCount($this->app, $i % 2 == 0 ? 'Passed' : 'Failed', 'Dummy hits', strtotime($date));
+        AppsEntityRestrictionsReports::createEntityViewCount($this->app, $i % 2 == 0 ? 'passed' : 'failed', 'Dummy hits', strtotime($date));
       }
     }
 
@@ -76,6 +76,22 @@ class AppsEntityRestrictionsReportsCacheManagerTest extends DrupalWebTestCase {
       $total_hits = AppsEntityRestrictionsReports::cacheManager($this->app)->getHitsManager()->getDateHits($date, 'total');
       $this->assertEqual($total_hits, $hits, format_string('The total hits from the cache for the date @date are @hits.', array('@hits' => $hits, '@date' => $date)));
     }
+
+    // Check multiple cache loading.
+    $cache_manager = AppsEntityRestrictionsReports::cacheManager($this->app);
+    $hits_manager = $cache_manager->getHitsManager();
+
+    $date = '01/01/2015';
+    $results = $cache_manager
+      ->resetCacheIds()
+      ->addCacheId($cache_manager->getCacheId($hits_manager->getSuffix($date, 'passed')))
+      ->addCacheId($cache_manager->getCacheId($hits_manager->getSuffix($date, 'failed')))
+      ->addCacheId($cache_manager->getCacheId($hits_manager->getSuffix($date, 'total')))
+      ->loadMultiple();
+
+    $this->assertEqual($results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'passed'))]->data, 2, 'Multiple cache for passed hits return the expected value.');
+    $this->assertEqual($results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'failed'))]->data, 2, 'Multiple cache for failed hits return the expected value.');
+    $this->assertEqual($results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'total'))]->data, 4, 'Multiple cache for total hits return the expected value.');
   }
 
   /**
