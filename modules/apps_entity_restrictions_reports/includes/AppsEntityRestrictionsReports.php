@@ -149,41 +149,19 @@ class AppsEntityRestrictionsReports {
     foreach ($days as $day) {
       $date = $day . '/' . $month;
 
+      $passed_cache = $cache_manager->getCacheId($hits_manager->getSuffix($date, 'passed'));
+      $failed_cache = $cache_manager->getCacheId($hits_manager->getSuffix($date, 'failed'));
+      $total_cache = $cache_manager->getCacheId($hits_manager->getSuffix($date, 'total'));
       $results = $cache_manager
         ->resetCacheIds()
-        ->addCacheId($cache_manager->getCacheId($hits_manager->getSuffix($date, 'passed')))
-        ->addCacheId($cache_manager->getCacheId($hits_manager->getSuffix($date, 'failed')))
-        ->addCacheId($cache_manager->getCacheId($hits_manager->getSuffix($date, 'total')))
+        ->addCacheId($passed_cache)
+        ->addCacheId($failed_cache)
+        ->addCacheId($total_cache)
         ->loadMultiple();
 
-      if ($results && count($results) == 3) {
-        if (empty($results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'passed'))]->data)) {
-          $hits[0][] = AppsEntityRestrictionsReports::countHits($date, 'passed', $app);
-        }
-        else {
-          $hits[0][] = $results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'passed'))]->data;
-        }
-
-        if (empty($results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'failed'))]->data)) {
-          $hits[1][] = AppsEntityRestrictionsReports::countHits($date, 'failed', $app);
-        }
-        else {
-          $hits[1][] = $results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'failed'))]->data;
-        }
-
-        if (empty($results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'total'))]->data)) {
-          $hits[2][] = AppsEntityRestrictionsReports::countHits($date, 'total', $app);
-        }
-        else {
-          $hits[2][] = $results[$cache_manager->getCacheId($hits_manager->getSuffix($date, 'total'))]->data;
-        }
-
-      }
-      else {
-        $hits[0][] = AppsEntityRestrictionsReports::countHits($date, 'passed', $app);
-        $hits[1][] = AppsEntityRestrictionsReports::countHits($date, 'failed', $app);
-        $hits[2][] = AppsEntityRestrictionsReports::countHits($date, 'total', $app);
-      }
+      $hits[0][] = !empty($results[$passed_cache]->data) ? $results[$passed_cache]->data : AppsEntityRestrictionsReports::countHits($date, 'passed', $app);
+      $hits[1][] = !empty($results[$failed_cache]->data) ? $results[$failed_cache]->data : AppsEntityRestrictionsReports::countHits($date, 'failed', $app);
+      $hits[2][] = !empty($results[$total_cache]->data) ? $results[$total_cache]->data : AppsEntityRestrictionsReports::countHits($date, 'total', $app);
     }
 
     return $hits;
