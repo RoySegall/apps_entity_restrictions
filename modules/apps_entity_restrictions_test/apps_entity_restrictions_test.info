@@ -1,0 +1,9 @@
+name = Apps entity restrictions test
+description = Dummy module for the tests.
+package = Apps entity restrictions
+core = 7.x
+hidden = TRUE
+
+dependencies[] = apps_entity_restrictions_restful
+dependencies[] = entity
+dependencies[] = entity_test

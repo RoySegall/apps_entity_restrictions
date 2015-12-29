@@ -1,0 +1,159 @@
+<?php
+
+/**
+ * @file
+ * Contains \AppsEntityRestrictionsRestfulBaseTest.
+ */
+
+class AppsEntityRestrictionsRestfulEntityAccess extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Apps entity restrictions restful entity access',
+      'description' => 'Testing application integration with entity without access callback.',
+      'group' => 'Apps entity restrictions',
+    );
+  }
+
+  /**
+   * @var AppsEntityRestriction
+   */
+  protected $app;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp(array('apps_entity_restrictions_test'));
+
+    // Create application.
+    $this->app = apps_entity_restrictions_create();
+    $this->app
+      ->setTitle('Demo application')
+      ->allow('node', 'methods', 'get')
+      ->allow('node', 'properties', 'nid')
+      ->allow('node', 'properties', 'body')
+      ->save();
+  }
+
+  /**
+   * Verify AppsEntityRestrictionsRestful::accessCallbacks() applies the
+   * restriction logic.
+   */
+  public function testBasicRestrictions() {
+    // Create a node and populate fields for testing.
+    $node = $this->drupalcreateNode(array('type' => 'article'));
+    $wrapper = entity_metadata_wrapper('node', $node);
+    $wrapper->field_tags->set(array($this->term->tid));
+    $wrapper->body->set(array('value' => $this->randomString()));
+    $wrapper->save();
+
+    // Verify the field is populated.
+    $this->assertTrue($wrapper->field_tags->value(array('identifier' => TRUE)), 'The taxonomy reference field is populated.');
+
+    /** @var AppsEntityRestrictionsRestfulBaseNode $handler */
+    $handler = restful_get_restful_handler('aer_articles');
+
+    try {
+      $handler->process();
+      $this->fail('The request did not failed since the app credentials was not available.');
+    } catch (\RestfulException $e) {
+      $this->pass('The request failed since the app credentials was not available.');
+    }
+
+    $content = $handler->setApp($this->app)->get($node->nid);
+
+    // Verify we got the allowed fields.
+    $result = $content[0];
+    $this->assertTrue(empty($result['tags']) && !empty($result['body']), 'The field body was return and the fields tags not.');
+
+    // Set the tags field as optional for the app and check we got it.
+    $this->app->allow('node', 'properties', 'field_tags');
+    $this->app->save();
+
+    // Do the same request again and see we got the tags and the body.
+    $content = $handler->setApp($this->app)->get($node->nid);
+    $result = $content[0];
+    $this->assertTrue(!empty($result['tags']) && !empty($result['body']), 'The field body and the fields tags returned.');
+  }
+
+  /**
+   * Testing other requests and their limitation other than GET.
+   */
+  public function testVariousRequests() {
+    // Creating a node.
+    $node = $this->drupalcreateNode(array('type' => 'article'));
+    $wrapper = entity_metadata_wrapper('node', $node);
+    $wrapper->body->set(array('value' => $this->randomString()));
+    $wrapper->save();
+
+    /** @var RestfulEntityBase $handler */
+    $handler = restful_get_restful_handler('aer_articles');
+    $handler->setApp($this->app);
+
+    // Disable any request.
+    $this->app
+      ->restrict('node', 'methods', 'get')
+      ->restrict('node', 'methods', 'post')
+      ->restrict('node', 'methods', 'patch')
+      ->restrict('node', 'methods', 'delete')
+      ->save();
+
+    // Test get.
+    try {
+      $handler->get($node->nid);
+      $this->fail('The app commit a GET request.');
+    } catch (\RestfulException $e) {
+      $this->pass('The app did not commit a GET request');
+    }
+
+    // Allow get.
+    $this->app->allow('node', 'methods', 'get')->save();
+    $handler->get($node->nid);
+    $this->pass('The app commit a GET request after allowing it.');
+
+    // Test POST.
+    try {
+      $handler->post('', array('body' => 'Test'));
+      $this->fail('The app commit a POST request.');
+    } catch (\RestfulException $e) {
+      $this->pass('The app did not commit a POST request');
+    }
+
+    // Allow post.
+    $this->app->allow('node', 'methods', 'post')->save();
+    $node = $handler->post('', array('body' => 'Test'));
+    $node = $node[0];
+
+    $this->assertEqual($node['body']['value'], 'Test', 'The post request has committed as expected.');
+
+    // Test PATCH.
+    try {
+      $handler->patch($node['id'], array('body' => 'Test after update.'));
+      $this->fail('The app commit a PATCH request.');
+    } catch (\RestfulException $e) {
+      $this->pass('The app did not commit a PATCH request');
+    }
+
+    // Allow patch.
+    $this->app->allow('node', 'methods', 'update')->save();
+    $update_node = $handler->patch($node['id'], array('body' => 'Test after update.'));
+    $update_node = $update_node[0];
+    $this->assertNotEqual($node['body']['value'], $update_node['body']['value'], 'The patch request has committed as expected.');
+
+    try {
+      $handler->delete($node['id']);
+      $this->fail('The app commit a DELETE request.');
+    } catch (\RestfulException $e) {
+      $this->pass('The app did not commit a DELETE request');
+    }
+
+    // Allow delete.
+    $this->app->allow('node', 'methods', 'delete')->save();
+    $handler->delete($node['id']);
+
+    // Verify the node does not exists any more.
+    $this->assertTrue(!node_load($node['id']), 'The app commit a DELETE request.');
+  }
+
+}
