@@ -18,17 +18,24 @@ function apps_entity_restrictions_test_ctools_plugin_directory($module, $plugin)
  * Implements hook_entity_info_alter().
  */
 function apps_entity_restrictions_test_entity_info_alter(&$info) {
-  // todo: add a variable to decide when to allow the alteration and when not.
-  // We need an entity without any access callback.
-  $info['entity_test']['access callback'] = '';
+  if (variable_get('entity_test_access_callback_alter')) {
+    $info['entity_test']['access callback'] = 'apps_entity_restrictions_test_entity_access_callback_false';
+  }
 
   // We need an entity with access callback.
-  $info['entity_test2']['access callback'] = 'apps_entity_restrictions_test_entity_access_callback';
+  $info['entity_test2']['access callback'] = 'apps_entity_restrictions_test_entity_access_callback_true';
 }
 
 /**
- * Access callback. Dummy access callback.
+ * Access callback. Dummy access callback in order to return TRUE.
  */
-function apps_entity_restrictions_test_entity_access_callback() {
+function apps_entity_restrictions_test_entity_access_callback_true() {
   return TRUE;
+}
+
+/**
+ * Access callback. Dummy access callback in order to return FALSE.
+ */
+function apps_entity_restrictions_test_entity_access_callback_false() {
+  return FALSE;
 }
