@@ -59,7 +59,17 @@ trait AppsEntityRestrictionsRestfulTrait {
    * {@inheritdoc}
    */
   public function checkEntityAccess($op, $entity_type, $entity) {
-    return parent::checkEntityAccess($op, $entity_type, $entity) && AppsEntityRestrictionsRestful::checkEntityAccess($this);
+    $info = $this->getEntityInfo($entity_type);
+
+    $traitAccess = AppsEntityRestrictionsRestful::checkEntityAccess($this);
+
+    if (empty($info['access callback'])) {
+      // The entity type does not implement access callback. Just checking if
+      // the apps have any access to the resource.
+      return $traitAccess;
+    }
+
+    return parent::checkEntityAccess($op, $entity_type, $entity) && $traitAccess;
   }
 
 }

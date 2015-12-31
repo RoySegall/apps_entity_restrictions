@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * apps_entity_restrictions_test.module
+ */
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function apps_entity_restrictions_test_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'restful') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function apps_entity_restrictions_test_entity_info_alter(&$info) {
+  if (variable_get('entity_test_access_callback_alter')) {
+    $info['entity_test']['access callback'] = 'apps_entity_restrictions_test_entity_access_callback_false';
+  }
+
+  // We need an entity with access callback.
+  $info['entity_test2']['access callback'] = 'apps_entity_restrictions_test_entity_access_callback_true';
+}
+
+/**
+ * Access callback. Dummy access callback in order to return TRUE.
+ */
+function apps_entity_restrictions_test_entity_access_callback_true() {
+  return TRUE;
+}
+
+/**
+ * Access callback. Dummy access callback in order to return FALSE.
+ */
+function apps_entity_restrictions_test_entity_access_callback_false() {
+  return FALSE;
+}

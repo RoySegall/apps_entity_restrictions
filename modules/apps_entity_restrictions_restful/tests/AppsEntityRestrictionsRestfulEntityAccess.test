@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * Contains \AppsEntityRestrictionsRestfulEntityAccess.
+ */
+
+class AppsEntityRestrictionsRestfulEntityAccess extends DrupalWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Apps entity restrictions restful entity access',
+      'description' => 'Testing application integration with entity without access callback.',
+      'group' => 'Apps entity restrictions',
+    );
+  }
+
+  /**
+   * @var AppsEntityRestriction
+   */
+  protected $app;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp(array('apps_entity_restrictions_test'));
+
+    // Create application.
+    $this->app = apps_entity_restrictions_create();
+    $this->app
+      ->setTitle('Demo application')
+      ->allow('entity_test', 'methods', 'get')
+      ->allow('entity_test2', 'methods', 'get')
+      ->allow('entity_test', 'properties', 'id')
+      ->allow('entity_test2', 'properties', 'id')
+      ->save();
+  }
+
+  /**
+   * Verify AppsEntityRestrictionsRestful::accessCallbacks() can handle entities
+   * without access callbacks.
+   */
+  public function testOrphanedEntityAccessCallbacksEntities() {
+
+    /** @var AppsEntityRestrictionsTestAccessEntity $handler */
+    $handler = restful_get_restful_handler('entity_test');
+    $handler->setApp($this->app);
+
+    $this->assertTrue($handler->checkEntityAccess('view', 'entity_test', NULL), '"entity_test" access callback was not invoked since it is undefined.');
+    $this->assertTrue($handler->checkEntityAccess('view', 'entity_test2', NULL), '"entity_test2" access callback was invoked.');
+
+    // Setting this variable to TRUE will alter the access callback.
+    // @see apps_entity_restrictions_test_entity_info_alter().
+    variable_set('entity_test_access_callback_alter', TRUE);
+    entity_info_cache_clear();
+
+    $this->assertFalse($handler->checkEntityAccess('view', 'entity_test', NULL), '"entity_test" access callback was invoked.');
+    $this->assertTrue($handler->checkEntityAccess('view', 'entity_test2', NULL), '"entity_test2" access callback was invoked.');
+  }
+
+}
