@@ -64,8 +64,8 @@ trait AppsEntityRestrictionsRestfulTrait {
     $traitAccess = AppsEntityRestrictionsRestful::checkEntityAccess($this);
 
     if (empty($info['access callback'])) {
-      // The current entity type does not have any access callback there for we
-      // only need to the app access callback.
+      // The entity type does not implement access callback. Just checking if
+      // the apps have any access to the resource.
       return $traitAccess;
     }
 
