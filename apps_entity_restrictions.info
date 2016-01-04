@@ -7,6 +7,7 @@ dependencies[] = entity
 
 ; Required.
 files[] = includes/AppsEntityRestriction.php
+files[] = includes/AppsEntityRestrictionsControllerExportable.php
 
 ; Exception
 files[] = includes/AppsEntityRestrictionsException.php

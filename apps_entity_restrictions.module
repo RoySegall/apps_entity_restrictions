@@ -12,11 +12,17 @@ function apps_entity_restrictions_entity_info() {
     'apps_entity_restrictions' => array(
       'label' => t('Apps entity restrictions'),
       'entity class' => 'AppsEntityRestriction',
-      'controller class' => 'EntityAPIController',
+      'controller class' => 'AppsEntityRestrictionsControllerExportable',
       'base table' => 'apps_entity_restrictions',
       'entity keys' => array(
         'id' => 'id',
         'label' => 'title',
+        'name' => 'app_key',
+      ),
+      'exportable' => TRUE,
+      'module' => 'apps_entity_restrictions',
+      'export' => array(
+        'default hook' => 'hook_default_apps_entity_restrictions',
       ),
     ),
   );
@@ -285,11 +291,11 @@ function apps_entity_restrictions_permission() {
  * @param $key
  *   The key of the app.
  * @param $secret
- *   The secret key of the app.
+ *   The secret key of the app. Optional.
  *
  * @return AppsEntityRestriction
  */
-function apps_entity_restrictions_load_by_keys($key, $secret) {
+function apps_entity_restrictions_load_by_keys($key, $secret = NULL) {
   $info = &drupal_static(__FUNCTION__, array());
   $static_identifier = $key . '_' . $secret;
 
@@ -299,11 +305,15 @@ function apps_entity_restrictions_load_by_keys($key, $secret) {
   else {
     $query = new entityFieldQuery();
 
-    $result = $query
+    $query
       ->entityCondition('entity_type', 'apps_entity_restrictions')
-      ->propertyCondition('app_key', $key)
-      ->propertyCondition('app_secret', $secret)
-      ->execute();
+      ->propertyCondition('app_key', $key);
+
+    if ($secret) {
+      $query->propertyCondition('app_secret', $secret);
+    }
+
+    $result = $query->execute();
 
     $info[$static_identifier] = !empty($result['apps_entity_restrictions']) ? apps_entity_restrictions_load(reset($result['apps_entity_restrictions'])->id) : '';
     $return = $info[$static_identifier];
