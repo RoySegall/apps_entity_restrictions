@@ -392,4 +392,14 @@ class AppsEntityRestriction extends Entity {
     module_invoke_all('apps_entity_restriction_app_event_listener', $this, $info);
   }
 
+  /**
+   * Check if the app is exported via features or not.
+   *
+   * @return bool
+   */
+  public function isAppExported() {
+    module_load_include('export.inc', 'features');
+    return in_array($this->getAppKey(), array_keys(features_get_default('apps_entity_restrictions')));
+  }
+
 }

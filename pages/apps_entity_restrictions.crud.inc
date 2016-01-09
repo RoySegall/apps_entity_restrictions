@@ -26,7 +26,7 @@ function apps_entity_restrictions_app_form($form, &$form_state, AppsEntityRestri
     '#type' => 'machine_name',
     '#default_value' => $app->app_key,
     '#maxlength' => 32,
-    '#disabled' => !$app->is_new,
+    '#disabled' => empty($app->is_new),
     '#machine_name' => array(
       'exists' => 'apps_entity_restrictions_app_exists',
     ),

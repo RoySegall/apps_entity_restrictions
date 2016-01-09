@@ -207,8 +207,8 @@ function apps_entity_restrictions_access_main_app_page($account = NULL) {
 /**
  * Access callback for action on app.
  *
- * @param $access
- *   The access name.
+ * @param $operation
+ *   The operation name.
  * @param AppsEntityRestriction $app
  *   The app object
  * @param $account
@@ -217,7 +217,12 @@ function apps_entity_restrictions_access_main_app_page($account = NULL) {
  * @return bool
  *   Return true or false if the user has access for this action.
  */
-function apps_entity_restrictions_access($access, AppsEntityRestriction $app, $account = NULL) {
+function apps_entity_restrictions_access($operation, AppsEntityRestriction $app, $account = NULL) {
+
+  if ($operation == 'delete') {
+    return !$app->isAppExported();
+  }
+
   if (!$account) {
     global $user;
     $account = user_load($user->uid);
@@ -229,7 +234,7 @@ function apps_entity_restrictions_access($access, AppsEntityRestriction $app, $a
     return TRUE;
   }
 
-  $edit_permission = $access;
+  $edit_permission = $operation;
   if ($account->uid == $app->uid) {
     $edit_permission .= ' own';
   }
@@ -237,7 +242,8 @@ function apps_entity_restrictions_access($access, AppsEntityRestriction $app, $a
 
   // Collect access information from other modules. See first if other modules
   // allowed this action. Only TRUE will accepted.
-  $invoked_access = module_invoke_all('apps_entity_restrictions_access', $access, $app, $account);
+  $invoked_access = module_invoke_all('apps_entity_restrictions_access', $operation, $app, $account);
+
   if (in_array(TRUE, $invoked_access, TRUE)) {
     return TRUE;
   }
