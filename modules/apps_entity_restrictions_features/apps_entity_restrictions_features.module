@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the apps_entity_restrictions_features feature.
+ */
+
+include_once 'apps_entity_restrictions_features.features.inc';

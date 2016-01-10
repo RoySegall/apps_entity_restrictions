@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Contains \AppsEntityRestrictionsRestfulBaseTest.
+ */
+
+class appsEntityRestrictionsFeatures extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Apps entity restrictions features',
+      'description' => 'Testing features integration.',
+      'group' => 'Apps entity restrictions',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp(array('apps_entity_restrictions_features'));
+  }
+
+  /**
+   * Verifying the features integration works as expected.
+   */
+  public function testFeaturesIntegration() {
+    $app = apps_entity_restrictions_load_by_keys('demo_app_deployment');
+
+    $need = array(
+      'comment' => array('methods' => array('get'), 'properties' => array('comment_body')),
+      'node' => array('methods' => array('get'), 'properties' => array('nid', 'body')),
+    );
+    $this->assertEqual($app->getTitle(), 'Demo app deployment');
+    $this->assertEqual($app->getDescription(), 'Demonstrating how an app can be deployed using features.');
+    $this->assertEqual($need, $app->getNeed());
+  }
+
+}

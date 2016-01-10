@@ -163,7 +163,11 @@ function apps_entity_restrictions_app_form($form, &$form_state, AppsEntityRestri
 }
 
 /**
+ * Check if the app exists or not.
+ *
  * @param $public
+ *   The public key for the app.
+ *
  * @return bool
  */
 function apps_entity_restrictions_app_exists($public) {
