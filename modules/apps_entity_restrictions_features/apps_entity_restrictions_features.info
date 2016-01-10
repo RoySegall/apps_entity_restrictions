@@ -1,0 +1,14 @@
+name = apps_entity_restrictions_features
+description = Demonstrating how an app can be deployed using features.
+package = Apps entity restrictions
+core = 7.x
+
+dependencies[] = apps_entity_restrictions
+dependencies[] = entity
+dependencies[] = features
+
+features[apps_entity_restrictions][] = demo_app_deployment
+features[features_api][] = api:2
+
+; Test file.
+files[] = tests/appsEntityRestrictionsFeatures.test

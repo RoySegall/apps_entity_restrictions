@@ -320,7 +320,10 @@ class AppsEntityRestriction extends Entity {
   public function generateKeyAndSecret() {
     $user = user_load($this->uid);
 
-    $this->app_key = str_replace(array(' ', '', '-'), '_', strtolower($this->title));
+    if (empty($this->app_key)) {
+      $this->app_key = str_replace(array(' ', '', '-'), '_', strtolower($this->title));
+    }
+
     $this->app_secret = md5($user->name . $this->time . $this->app_key);
   }
 
@@ -387,6 +390,21 @@ class AppsEntityRestriction extends Entity {
    */
   public function dispatch(array $info = array()) {
     module_invoke_all('apps_entity_restriction_app_event_listener', $this, $info);
+  }
+
+  /**
+   * Check if the app is exported via features or not.
+   *
+   * @return bool
+   */
+  public function isAppExported() {
+
+    if (!module_exists('features')) {
+      return;
+    }
+
+    module_load_include('export.inc', 'features');
+    return in_array($this->getAppKey(), array_keys(features_get_default('apps_entity_restrictions')));
   }
 
 }

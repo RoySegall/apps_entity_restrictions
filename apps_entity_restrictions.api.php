@@ -58,8 +58,8 @@ function hook_apps_entity_restrictions_app_options_alter(&$items, AppsEntityRest
  * The hook_apps_entity_restrictions_access() need to return TRUE or FALSE.
  * @see hook_node_access().
  *
- * @param $access
- *   The access name.
+ * @param $operation
+ *   The operation name.
  * @param AppsEntityRestriction $app
  *   The app object
  * @param $account
@@ -68,7 +68,7 @@ function hook_apps_entity_restrictions_app_options_alter(&$items, AppsEntityRest
  * @return bool
  *   Need to return TRUE/FALSE.
  */
-function hook_apps_entity_restrictions_access($access, AppsEntityRestriction $app, $account) {
+function hook_apps_entity_restrictions_access($operation, AppsEntityRestriction $app, $account) {
 }
 
 /**

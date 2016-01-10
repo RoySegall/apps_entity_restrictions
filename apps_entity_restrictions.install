@@ -58,14 +58,20 @@ function apps_entity_restrictions_schema() {
       ),
       'app_key' => array(
         'description' => 'The key of the app.',
-        'type' => 'text',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
       ),
       'app_secret' => array(
         'description' => 'The secret of the app.',
         'type' => 'text',
       ),
-    ),
+    ) + entity_exportable_schema_fields(),
     'primary key' => array('id'),
+    'unique keys' => array(
+      'app_key' => array('app_key'),
+    ),
   );
 
   return $schema;

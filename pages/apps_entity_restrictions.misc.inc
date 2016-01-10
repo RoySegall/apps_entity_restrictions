@@ -13,6 +13,7 @@ function apps_entity_restrictions_main_app_page() {
     ->entityCondition('entity_type', 'apps_entity_restrictions')
     ->execute();
 
+  /** @var AppsEntityRestriction[] $apps */
   $apps = array();
   if (!empty($result['apps_entity_restrictions'])) {
     $apps = apps_entity_restrictions_load_multiple(array_keys($result['apps_entity_restrictions']));
@@ -35,7 +36,10 @@ function apps_entity_restrictions_main_app_page() {
 
       $items = array();
       $items[] = $app->generateLink('edit');
-      $items[] = $app->generateLink('delete');
+
+      if ($app->isAppExported() !== FALSE) {
+        $items[] = $app->generateLink('delete');
+      }
 
       if (module_exists('devel') && user_access('access devel information')) {
         $items[] = $app->generateLink('devel');

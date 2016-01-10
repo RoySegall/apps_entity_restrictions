@@ -14,12 +14,23 @@ function apps_entity_restrictions_app_form($form, &$form_state, AppsEntityRestri
 
   $form_state['#entity'] = $app;
 
-  $form['title'] = array(
+  $form['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Title'),
     '#description' => t('The name of the application.'),
     '#required' => TRUE,
     '#default_value' => $app->title,
+  );
+
+  $form['app_key'] = array(
+    '#type' => 'machine_name',
+    '#default_value' => $app->app_key,
+    '#maxlength' => 32,
+    '#disabled' => empty($app->is_new),
+    '#machine_name' => array(
+      'exists' => 'apps_entity_restrictions_app_exists',
+    ),
+    '#description' => t('A unique machine-readable name for this application. It must only contain lowercase letters, numbers, and underscores.'),
   );
 
   $form['description'] = array(
@@ -94,7 +105,7 @@ function apps_entity_restrictions_app_form($form, &$form_state, AppsEntityRestri
 
   $form['author'] = array(
     '#type' => 'fieldset',
-    '#access' => user_access('administer nodes'),
+    '#access' => user_access('manage apps'),
     '#title' => t('Authoring information'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
@@ -102,7 +113,7 @@ function apps_entity_restrictions_app_form($form, &$form_state, AppsEntityRestri
     '#weight' => 90,
   );
 
-  $form['author']['name'] = array(
+  $form['author']['owner'] = array(
     '#type' => 'textfield',
     '#title' => t('Authored by'),
     '#maxlength' => 60,
@@ -114,7 +125,7 @@ function apps_entity_restrictions_app_form($form, &$form_state, AppsEntityRestri
 
   $form['oauth'] = array(
     '#type' => 'fieldset',
-    '#access' => user_access('administer nodes'),
+    '#access' => user_access('manage apps'),
     '#title' => t('oAuth information'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
@@ -150,11 +161,23 @@ function apps_entity_restrictions_app_form($form, &$form_state, AppsEntityRestri
 }
 
 /**
+ * Check if the app exists or not.
+ *
+ * @param $public
+ *   The public key for the app.
+ *
+ * @return bool
+ */
+function apps_entity_restrictions_app_exists($public) {
+  return apps_entity_restrictions_load_by_keys($public, NULL) ? TRUE : FALSE;
+}
+
+/**
  * Validate handler.
  */
 function apps_entity_restrictions_app_form_validate($form, $form_state) {
   // App name should be only in english.
-  if (preg_match('/[^A-Za-z0-9 ]/', $form_state['values']['title'])) {
+  if (preg_match('/[^A-Za-z0-9 ]/', $form_state['values']['name'])) {
     form_set_error('title', t('The name of the app should be only in english.'));
   }
 
@@ -217,10 +240,11 @@ function apps_entity_restrictions_app_form_submit($form, &$form_state) {
   }
 
   // Building the entity object.
-  $app->title = $values['title'];
+  $app->title = $values['name'];
+  $app->app_key = $values['app_key'];
   $app->description = $values['description'];
   $app->need = $need;
-  $app->uid = user_load_by_name($values['name'])->uid;
+  $app->uid = user_load_by_name($values['owner'])->uid;
 
   // Generating secret and public for the entity.
   if (!empty($app->is_new)) {
