@@ -265,10 +265,6 @@ function apps_entity_restrictions_app_form_submit($form, &$form_state) {
   );
   drupal_set_message(t('The app @name has @op successful.', $params));
 
-  if (!empty($app->need['user'])) {
-    drupal_set_message(t('Your app need the user information. This could be achieved only when the user approve the app.'), 'warning');
-  }
-
   // Display message and redirect the user back to the main apps page.
   $form_state['redirect'] = 'admin/apps';
 }
