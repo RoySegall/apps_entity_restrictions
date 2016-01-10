@@ -220,7 +220,7 @@ function apps_entity_restrictions_access_main_app_page($account = NULL) {
 function apps_entity_restrictions_access($operation, AppsEntityRestriction $app, $account = NULL) {
 
   if ($operation == 'delete') {
-    return !$app->isAppExported();
+    return $app->isAppExported() === TRUE;
   }
 
   if (!$account) {

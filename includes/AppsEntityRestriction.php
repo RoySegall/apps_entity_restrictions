@@ -398,6 +398,11 @@ class AppsEntityRestriction extends Entity {
    * @return bool
    */
   public function isAppExported() {
+
+    if (!module_exists('features')) {
+      return;
+    }
+
     module_load_include('export.inc', 'features');
     return in_array($this->getAppKey(), array_keys(features_get_default('apps_entity_restrictions')));
   }

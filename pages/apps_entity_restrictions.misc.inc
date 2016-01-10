@@ -37,7 +37,7 @@ function apps_entity_restrictions_main_app_page() {
       $items = array();
       $items[] = $app->generateLink('edit');
 
-      if (!$app->isAppExported()) {
+      if ($app->isAppExported() !== FALSE) {
         $items[] = $app->generateLink('delete');
       }
 
