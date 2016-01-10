@@ -27,7 +27,7 @@ class AppsEntityRestrictionsBase extends DrupalWebTestCase {
 
     $this->app = apps_entity_restrictions_create();
     $this->app
-      ->setTitle('Demo application')
+      ->setTitle($this->randomString())
       ->allow('node', 'methods', 'get')
       ->allow('node', 'properties', 'nid')
       ->allow('node', 'properties', 'body')
