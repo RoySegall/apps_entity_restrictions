@@ -10,5 +10,5 @@ dependencies[] = features
 features[apps_entity_restrictions][] = demo_app_deployment
 features[features_api][] = api:2
 
-; Adding a test.
+; Test file.
 files[] = tests/appsEntityRestrictionsFeatures.test

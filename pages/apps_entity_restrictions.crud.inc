@@ -30,9 +30,7 @@ function apps_entity_restrictions_app_form($form, &$form_state, AppsEntityRestri
     '#machine_name' => array(
       'exists' => 'apps_entity_restrictions_app_exists',
     ),
-    '#description' => t('A unique machine-readable name for this content type. It must only contain lowercase letters, numbers, and underscores. This name will be used for constructing the URL of the %node-add page, in which underscores will be converted into hyphens.', array(
-      '%node-add' => t('Add new content'),
-    )),
+    '#description' => t('A unique machine-readable name for this application. It must only contain lowercase letters, numbers, and underscores.'),
   );
 
   $form['description'] = array(
@@ -107,7 +105,7 @@ function apps_entity_restrictions_app_form($form, &$form_state, AppsEntityRestri
 
   $form['author'] = array(
     '#type' => 'fieldset',
-    '#access' => user_access('administer nodes'),
+    '#access' => user_access('manage apps'),
     '#title' => t('Authoring information'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
@@ -127,7 +125,7 @@ function apps_entity_restrictions_app_form($form, &$form_state, AppsEntityRestri
 
   $form['oauth'] = array(
     '#type' => 'fieldset',
-    '#access' => user_access('administer nodes'),
+    '#access' => user_access('manage apps'),
     '#title' => t('oAuth information'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
